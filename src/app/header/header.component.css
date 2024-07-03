@@ -1,0 +1,73 @@
+header {
+    background-color: #003c58;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .logo img {
+    height: 40px; /* Adjust size as needed */
+  }
+  
+  section {
+    display: table;
+  }
+  
+  .example-label {
+    display: table-cell;
+    font-size: 14px;
+    margin-left: 8px;
+    min-width: 120px;
+  }
+  
+  .example-button-row {
+    display: table-cell;
+    max-width: 600px;
+  }
+  
+  .example-button-row .mat-mdc-button-base {
+    margin: 8px 8px 8px 0;
+  }
+  
+  .example-flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .example-button-container {
+    display: flex;
+    justify-content: center;
+    width: 120px;
+  }
+   
+  .nav-button a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #444;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    margin: 10px;
+  }
+  
+  .logout {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #444;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    margin: 10px;
+  }
+  
+  .nav-button a:hover {
+    background-color: #555;
+  }
+  
+  .nav-button {
+    margin-left: auto; /* Ensure it aligns to the right */
+  }
+  
