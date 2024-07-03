@@ -17,13 +17,13 @@ export class LogginComponent {
     // Assume the API returns a token on successful login 
 
     //AQUÍ SE MANEJARÁ LA LÓGICA DEL STREAM DE CARACTERES
-    const response = await firstValueFrom(this.authService.http.post<{ token: string }>('/api/login', { username, password }));
-    this.authService.setSessionToken(response.token);
+    //const response = await firstValueFrom(this.authService.http.post<{ token: string }>('/api/login', { username, password }));
+    //this.authService.setSessionToken(response.token);
     // Redirect to main or wherever needed
   }
 
-  logout() {
-    this.authService.clearSessionToken();
+  //logout() {
+  //  this.authService.clearSessionToken();
     // Redirect to login page or handle logout
-  }
+  //}
 }

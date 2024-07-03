@@ -6,19 +6,25 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(public http: HttpClient) {}
-
   private sessionKey = 'authToken';
+  private validationTimeout = 5 * 60 * 1000; // 5 minutes
+
+  constructor(private http: HttpClient) {}
+
   async validateSession(): Promise<boolean> {
-    return true; // Remove this line and uncomment the following lines to enable session validation
-    /*
+    const token = this.getSessionToken();
+    if (!token) {
+      return false;
+    }
+
     try {
-      const response = await firstValueFrom(this.http.get<{ isValid: boolean }>('/api/validate-session'));
+      const response = await firstValueFrom(this.http.get<{ isValid: boolean }>('/api/validate-session', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }));
       return response.isValid;
     } catch {
       return false;
     }
-      */
   }
 
   setSessionToken(token: string): void {
