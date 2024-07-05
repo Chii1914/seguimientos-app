@@ -1,4 +1,5 @@
 @charset "utf-8";
+
 .page-center {
   display: flex;
   justify-content: center;
@@ -8,14 +9,7 @@
 
 .buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: row;
+  flex-direction: row; /* Ensure buttons are in a row */
   align-items: center;
   justify-content: center;
   max-height: 100%;
@@ -31,7 +25,8 @@
   border: 2px solid lightgray;
   box-shadow: 2px 2px 8px 4px #d3d3d3d1;
   border-radius: 15px;
-  margin-right: 50px; /* Add margin-bottom for separation */
+  margin-right: 20px; /* Adjust margin for separation */
+  margin-bottom: 20px; /* Add margin-bottom for separation */
 }
 .tarjeta:hover {
   border: 2px solid #a3a3a3; /* Slightly darker border on hover */
@@ -42,28 +37,29 @@
 
 .titulo {
   font-size: 24px;
-  padding: 10px 10px 0 10px;
+  padding: 10px; /* Uniform padding */
   text-align: center;
 }
+
 .cuerpo {
-  padding: 10px;;
+  padding: 10px; /* Uniform padding */
 }
+
 .pie {
   background: #003c58;
   border-radius: 0 0 15px 15px;
-  padding: 10px;
+  padding: 10px; /* Uniform padding */
   text-align: center;
 }
+
 .pie a {
   text-decoration: none;
   color: white;
+  position: relative; /* Ensure position is relative for pseudo-element */
 }
+
 .pie a:after {
   position: absolute;
   top: 0;
   right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  content: "";
 }

@@ -1,41 +1,42 @@
 <app-header [headerIsLoggedIn]="false"></app-header>
 
-<div class="buttons">
-    <div class="tarjeta">
-        <div class="titulo">Ver Alumnos y Seguimientos</div>
-        <div class="cuerpo">
-            <p>Aquí se podrán visualizar a cada alumno y su respectivo seguimiento, así también como exportar sus
-                documentos respectivos</p>
+<div class="page-center">
+    <div class="buttons">
+        <div class="tarjeta">
+            <div class="titulo">Ver Alumnos y Seguimientos</div>
+            <div class="cuerpo">
+                <p>Aquí se podrán visualizar a cada alumno y su respectivo seguimiento, así también como exportar sus
+                    documentos respectivos</p>
+            </div>
+            <div class="pie">
+                <div class="botones">
+                    <button mat-flat-button> Añadir </button>
+                </div>
+            </div>
         </div>
-        <div class="pie">
-            <div class="botones">
-                <button mat-flat-button> Añadir </button>
+
+        <div class="tarjeta">
+            <div class="titulo">Añadir Alumno</div>
+            <div class="cuerpo">
+                <p>En esta sección se puede añadir un alumno al cual, se le puede realizar inmediatamente un seguimiento</p>
+            </div>
+            <div class="pie">
+                <div class="botones">
+                    <button mat-flat-button> Añadir </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="titulo">Reportes</div>
+            <div class="cuerpo">
+                <p>Se pueden generar distintos reportes, para el posterior análisis de datos</p>
+            </div>
+            <div class="pie">
+                <div class="botones">
+                    <button mat-flat-button> Generar </button>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="tarjeta">
-        <div class="titulo">Añadir Alumno</div>
-        <div class="cuerpo">
-            <p>En esta sección se puede añadir un alumno al cual, se le puede realizar inmediatamente un seguimiento</p>
-
-        </div>
-        <div class="pie">
-            <div class="botones">
-                <button mat-flat-button> Añadir </button>
-            </div>
-
-        </div>
-    </div>
-    <div class="tarjeta">
-        <div class="titulo">Reportes</div>
-        <div class="cuerpo">
-            <p>Se pueden generar distintos reportes, para el posterior análisis de datos</p>
-
-        </div>
-        <div class="pie">
-            <div class="botones">
-                <button mat-flat-button> Generar </button>
-            </div>
-        </div>
-    </div>
+</div>
