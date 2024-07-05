@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-
+import { Router } from '@angular/router';
+import { CookieService } from '../cookies/cookie.service';
 
 @Component({
   selector: 'app-header',
@@ -10,5 +11,13 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  headerIsLoggedIn=true;
+  constructor(private router: Router, private cookieService: CookieService) { }
+
+  @Input() headerIsLoggedIn=true;
+
+  logout() {
+    this.cookieService.deleteCookie('xvlf');
+    this.router.navigate(['/']);
+  }
+
 }

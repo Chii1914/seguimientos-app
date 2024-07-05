@@ -1,35 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { CookieService } from '../cookies/cookie.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private sessionKey = 'authToken';
-  private validationTimeout = 5 * 60 * 1000; // 5 minutes
   private validationStringKey = 'validationString';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,  private cookieService: CookieService) { }
 
-  async validateSession(): Promise<boolean> {
-    const token = this.getSessionToken();
-    
-    const validationString = this.getValidationString();
-    if (!token || !validationString) {
+  async verifySession(): Promise<boolean> {
+    const xvlf = this.cookieService.getCookie('xvlf');
+    if (!xvlf) {
       return false;
     }
-
+    // Assuming you send the cookie value to the server to verify the session
     try {
-      const response = await firstValueFrom(this.http.get<{ isValid: boolean }>('/api/validate-session', {
-        headers: { 'Authorization': `Bearer ${token}`, 'Validation-String': validationString }
+      const response = await firstValueFrom(this.http.get('http://localhost:3000/api/auth/verify', {
+        headers: {
+          Authorization: `Bearer ${xvlf}`
+        }
       }));
-      return response.isValid;
-    } catch {
-      return false;
+      if (response) {
+        return true;
+      }
+    } catch (error: any) {
+      if (error.status === 403) {
+        console.log('Forbidden');
+        return false;
+      }
     }
+    return false;
   }
-
 
   setSessionToken(token: string): void {
     localStorage.setItem(this.sessionKey, token);

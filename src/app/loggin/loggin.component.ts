@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 import { AuthService } from '../guard/auth.service';
-import { firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
 
+import { Router } from '@angular/router';
+import { CookieService } from '../cookies/cookie.service';
 
 @Component({
   selector: 'app-loggin',
@@ -13,7 +13,17 @@ import { Router } from '@angular/router';
   styleUrl: './loggin.component.css'
 })
 export class LogginComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private cookieService: CookieService) { }
+
+  navigateToMain() {
+    this.authService.verifySession().then(isValid => {
+      if (isValid) {
+        this.router.navigate(['/main']);
+      }else{
+        window.location.href = 'http://localhost:3000/api/auth/google';
+      }
+    });
+  }
 
 
   async login(username: string, password: string) {
@@ -35,12 +45,10 @@ export class LogginComponent {
 
 
   //Luego cambiar el método login por el call a la api de login
-  navigateToMain() {
-    this.router.navigate(['/main']);
-  }
+
 
   //logout() {
   //  this.authService.clearSessionToken();
-    // Redirect to login page or handle logout
+  // Redirect to login page or handle logout
   //}
 }

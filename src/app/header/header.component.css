@@ -7,6 +7,12 @@ header {
     justify-content: space-between;
   }
   
+  .botones{
+    display: table-cell;
+    max-width: 600px;
+    color: rgb(255, 247, 247);
+  }
+
   .logo img {
     height: 40px; /* Adjust size as needed */
   }
