@@ -1,4 +1,4 @@
-<app-header [headerIsLoggedIn]=false />
+<app-header [headerIsLoggedIn]="false"></app-header>
 <div class="p-4 bg-white shadow-lg rounded-lg border">
   <button
     class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
@@ -14,16 +14,23 @@
               Nombre
             </th>
             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+              Semestre
+            </th>
+            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+              RUT
+            </th>
+            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
               <span class="sr-only">Actions</span>
             </th>
           </tr>
         </thead>
         <tbody class="[&amp;_tr:last-child]:border-0">
-          <tr *ngFor="let student of students"
-            class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+          <tr *ngFor="let student of students" class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
             <td class="p-4 align-middle font-medium">{{ student.name }}</td>
+            <td class="p-4 align-middle font-medium">{{ student.semester }}</td>
+            <td class="p-4 align-middle font-medium">{{ student.rut }}</td>
             <td class="p-4 align-middle">
-              <button
+              <button (click)="openModal(student)"
                 class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
                 type="button">
                 Ver Seguimientos
@@ -33,7 +40,6 @@
         </tbody>
       </table>
     </div>
-
   </div>
-
 </div>
+<app-modal-follow-ups [showModal]="showModal" [student]="selectedStudent" (closeModalEvent)="handleCloseModal()"/>

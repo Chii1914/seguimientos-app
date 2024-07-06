@@ -1,0 +1,57 @@
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-900 bg-opacity-50">
+    <div class="relative w-full max-w-2xl p-4 mx-auto bg-white rounded-lg shadow-lg">
+      <div class="text-center">
+        <h3 class="text-lg font-medium text-gray-900">{{ student.name }}</h3>
+        <div class="mt-2 space-y-2">
+          <p class="text-sm text-gray-500">Semestre: {{ student.semester }}</p>
+          <p class="text-sm text-gray-500">RUT: {{ student.rut }}</p>
+          <p class="text-sm text-gray-500">Sede: {{ student.sede }}</p>
+          <p class="text-sm text-gray-500">Teléfono: {{ student.phone }}</p>
+          <p class="text-sm text-gray-500">Ubicación: {{ student.location }}</p>
+          <p class="text-sm text-gray-500">Carácter Académico: {{ student.academicCharacter }}</p>
+          <p class="text-sm text-gray-500">Motivos de Salud: {{ student.healthReason }}</p>
+          <p class="text-sm text-gray-500">Motivos Sociales: {{ student.socialReason }}</p>
+          <p class="text-sm text-gray-500">Acciones Remediales: {{ student.remedialAction }}</p>
+        </div>
+        <div class="mt-4 pt-4 border-t">
+          <div class="mb-4 flex justify-end">
+            <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300" (click)="addFollowUp()">
+              Add Follow-up
+            </button>
+          </div>
+          <div *ngIf="followups && followups.length > 0; else noFollowUps">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let followup of followups; let i = index">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i + 1 }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ followup.date | date:'mediumDate' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ followup.notes }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="px-2 py-1 text-blue-500 hover:text-blue-700 text: black" (click)="editFollowUp(followup._id)">Edit</button>
+                    <button class="px-2 py-1 text-red-500 hover:text-red-700" (click)="deleteFollowUp(followup._id)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noFollowUps>
+            <p class="text-sm text-gray-500">No follow-ups available.</p>
+          </ng-template>
+        </div>
+        <div class="mt-4">
+          <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300" (click)="closeModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
