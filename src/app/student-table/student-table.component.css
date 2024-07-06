@@ -1,0 +1,146 @@
+.border {
+    border: 1px solid #e5e7eb; /* Adjust to your desired border color */
+  }
+  
+  .rounded-lg {
+    border-radius: 0.5rem; /* Adjust to your desired border radius */
+  }
+  
+  .w-full {
+    width: 100%;
+  }
+  
+  .relative {
+    position: relative;
+  }
+  
+  .overflow-auto {
+    overflow: auto;
+  }
+  
+  .caption-bottom {
+    caption-side: bottom;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem; /* Adjust to your desired font size */
+  }
+  
+  .transition-colors {
+    transition: color 0.2s;
+  }
+  
+  .hover\:bg-muted\/50:hover {
+    background-color: rgba(195, 203, 218, 0.5); /* Adjust to your desired hover background color */
+  }
+  
+  .data-\[state\=selected\]\:bg-muted[data-state="selected"] {
+    background-color: #d1d5db; /* Adjust to your desired selected state background color */
+  }
+  
+  .h-12 {
+    height: 3rem;
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .text-left {
+    text-align: left;
+  }
+  
+  .align-middle {
+    vertical-align: middle;
+  }
+  
+  .font-medium {
+    font-weight: 500;
+  }
+  
+  .text-muted-foreground {
+    color: #806b6b; /* Adjust to your desired muted text color */
+  }
+  
+  .\[\&\:has\(\[role\=checkbox\]\)\]\:pr-0:has([role=checkbox]) {
+    padding-right: 0;
+  }
+  
+  .inline-flex {
+    display: inline-flex;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+  
+  .justify-center {
+    justify-content: center;
+  }
+  
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+  
+  .ring-offset-background {
+    outline-offset: 2px; /* Adjust to your desired outline offset */
+  }
+  
+  .focus-visible\:outline-none:focus-visible {
+    outline: none;
+  }
+  
+  .focus-visible\:ring-2:focus-visible {
+    ring-width: 2px;
+  }
+  
+  .focus-visible\:ring-ring:focus-visible {
+    ring-color: #3b82f6; /* Adjust to your desired ring color */
+  }
+  
+  .focus-visible\:ring-offset-2:focus-visible {
+    ring-offset-width: 2px;
+  }
+  
+  .disabled\:pointer-events-none:disabled {
+    pointer-events: none;
+  }
+  
+  .disabled\:opacity-50:disabled {
+    opacity: 0.5;
+  }
+  
+  .border-input {
+    border-color: #d1d5db; /* Adjust to your desired input border color */
+  }
+  
+  .bg-background {
+    background-color: #ffffff; /* Adjust to your desired background color */
+  }
+  
+  .hover\:bg-accent:hover {
+    background-color: #2563eb; /* Adjust to your desired accent hover background color */
+  }
+  
+  .hover\:text-accent-foreground:hover {
+    color: #ffffff; /* Adjust to your desired accent hover text color */
+  }
+  
+  .h-9 {
+    height: 2.25rem;
+  }
+  
+  .rounded-md {
+    border-radius: 0.375rem; /* Adjust to your desired border radius */
+  }
+  
+  .px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  

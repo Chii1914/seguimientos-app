@@ -15,23 +15,12 @@ import {MatButtonModule} from '@angular/material/button';
 export class MainComponent {
   constructor(private route: ActivatedRoute, private cookieService: CookieService, private router: Router) { }
 
-  //SACAR EL STRING DE CARACTERES DEL LOCALSTORAGE
-  /*
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const validationString = params['string'];
-      if (validationString) {
-        localStorage.setItem('validationString', validationString);
-      }
-    });
-  }
- */
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
 
       this.router.navigate([], {
         relativeTo: this.route,
-        replaceUrl: true // This replaces the current state in history
+        replaceUrl: true
       });
 
     });
