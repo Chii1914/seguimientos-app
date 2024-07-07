@@ -25,5 +25,12 @@ export class MainComponent {
 
     });
   }
- 
+  
+  navSeg() {
+    this.router.navigate(['/studentAll']);
+  }
+  navStudent(){
+    this.router.navigate(['/student']);
+  }
+  
 }

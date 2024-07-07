@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common'; // Import CommonModule
 import { HeaderComponent } from '../header/header.component';
 import { ModalFollowUpsComponent } from '../modal-follow-ups/modal-follow-ups.component';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -19,7 +20,9 @@ export class StudentTableComponent {
   showModal: boolean = false;
   selectedStudent: any;
   students: any;
-  constructor(private http: HttpClient, private cookieService: CookieService) { }
+  exportDropdownVisible: boolean = false;
+
+  constructor(private router: Router,private http: HttpClient, private cookieService: CookieService) { }
 
   async ngOnInit(): Promise<void> {
     const headers = { Authorization: `Bearer ${this.cookieService.getCookie('xvlf')}` };
@@ -31,6 +34,9 @@ export class StudentTableComponent {
       console.log(e);
     }
   }
+  goBack() {
+    this.router.navigate(['/main']);
+  }
 
   openModal(student: any) {
     this.selectedStudent = student;
@@ -39,4 +45,21 @@ export class StudentTableComponent {
   handleCloseModal() {
     this.showModal = false;
   }
+  toggleExportDropdown(student: any) {
+    this.selectedStudent = student;
+    this.exportDropdownVisible = !this.exportDropdownVisible;
+  }
+
+  exportToExcel(student: any) {
+    this.exportDropdownVisible =  !this.exportDropdownVisible;
+    // Implement your logic to export the student's data to Excel
+    console.log('Export to Excel', student);
+  }
+
+  generateWordFile(student: any) {
+    this.exportDropdownVisible =  !this.exportDropdownVisible;
+    // Implement your logic to generate a Word file with the student's data
+    console.log('Generate Word File', student);
+  }
+
 }

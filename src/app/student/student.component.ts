@@ -42,8 +42,8 @@ export class StudentComponent {
         this.router.navigate(['/main']);
         break;
       case 'back':
-        // Logic for going back
-        break;
+        this.router.navigate(['/main']);
+      break;
       default:
         break;
     }
