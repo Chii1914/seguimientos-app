@@ -5,12 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { CookieService } from '../cookies/cookie.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-student',
   standalone: true,
-  imports: [ReactiveFormsModule, HeaderComponent],
+  imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
   templateUrl: './student.component.html',
   styleUrl: './student.component.css'
 })

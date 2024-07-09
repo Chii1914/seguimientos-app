@@ -13,11 +13,15 @@
           </div>
           <div class="space-y-2">
             <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="rut">RUT (xxxxxxxx-x)</label>
-            <input id="rut" placeholder="Rut sin puntos y con guión" formControlName="rut" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+            <div class="space-y-2">
+              <input id="rut" placeholder="Rut sin puntos y con guión" formControlName="rut" pattern="[0-9]{7,8}-[0-9kK]" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" [ngClass]="{ 'border-red-500':studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched}" />
+              <div *ngIf="studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched && studentForm.get('rut')?.errors" class="text-red-500 text-sm">Ingrese un RUT válido.</div>
+            </div>
           </div>
           <div class="space-y-2">
             <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">CORREO INSTITUCIONAL</label>
-            <input id="email" placeholder="Ingrese correo" type="email" formControlName="email" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+            <input id="email" placeholder="Ingrese correo" type="email" formControlName="email" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" />
+            <div *ngIf="studentForm.get('email')?.invalid && studentForm.get('email')?.touched && studentForm.get('email')?.errors" class="text-red-500 text-sm">Ingrese un correo válido.</div>
           </div>
           <div class="space-y-2">
             <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="semester">SEMESTRE CURSA ACTUALMENTE</label>
@@ -44,10 +48,12 @@
               <option value="San Felipe">San Felipe</option>
             </select>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="phone">CELULAR DE CONTACTO</label>
-            <input id="phone" placeholder="Ingrese celular de contacto" formControlName="phone" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-          </div>
+            <div class="space-y-2"></div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="phone">CELULAR DE CONTACTO</label>
+              <input id="phone" placeholder="Ingrese celular de contacto" formControlName="phone" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" pattern="[0-9]{9}" />
+              <div *ngIf="studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched && studentForm.get('phone')?.errors" class="text-red-500 text-sm">Ingrese un número de celular válido.</div>
+            </div>
           <div class="space-y-2">
             <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="location">LUGAR</label>
             <input id="location" placeholder="Ingrese Campus" formControlName="location" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />

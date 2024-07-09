@@ -24,7 +24,7 @@
               <thead class="bg-gray-50">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -32,7 +32,7 @@
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr *ngFor="let followup of followups; let i = index">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i + 1 }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ followup.date | date:'mediumDate' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ followup.date | date:'short' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ followup.notes }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button class="px-2 py-1 text-blue-500 hover:text-blue-700 text: black" (click)="editFollowUp(followup._id)">Edit</button>
