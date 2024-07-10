@@ -1,0 +1,22 @@
+<div *ngIf="showModalStudent" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-900 bg-opacity-50">
+    <p class="text-sm text-gray-500">Semestre: {{ student.semester }}</p>
+    <p class="text-sm text-gray-500">RUT: {{ student.rut }}</p>
+    <p class="text-sm text-gray-500">Sede: {{ student.sede }}</p>
+    <p class="text-sm text-gray-500">Teléfono: {{ student.phone }}</p>
+    <p class="text-sm text-gray-500">Ubicación: {{ student.location }}</p>
+    <p class="text-sm text-gray-500">Carácter Académico: {{ student.academicCharacter }}</p>
+    <p class="text-sm text-gray-500">Motivos de Salud: {{ student.healthReason }}</p>
+    <p class="text-sm text-gray-500">Motivos Sociales: {{ student.socialReason }}</p>
+    <p class="text-sm text-gray-500">Acciones Remediales: {{ student.remedialAction }}</p>
+
+    <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300" (click)="updateStudent()">
+        Modificar Estudiante
+    </button>
+
+    <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300" (click)="deleteStudent()">
+        Borrar Estudiante
+      </button>
+      <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300" (click)="closeModal()">
+        Cerrar
+      </button>
+</div>

@@ -5,6 +5,10 @@
     type="button" (click)="goBack()" >
     Volver
   </button>
+  <button
+    class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+    type="button" (click)="goBack()" >
+  </button>
   <div class="border rounded-lg w-full">
     <div class="relative w-full overflow-auto">
       <table class="w-full caption-bottom text-sm">
@@ -35,16 +39,21 @@
                 type="button">
                 Ver Seguimientos
               </button>
+              <button (click)="openModalStudent(student)"
+                class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+                type="button">
+                Ver Alumno
+              </button>
               <div class="inline-flex items-center justify-center relative">
                 <button (click)="toggleExportDropdown(student)"
                   class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
                   type="button">
-                  Exportar Datos
+                  Exportar Estudiante
                 </button>
                 <div *ngIf="exportDropdownVisible && selectedStudent === student" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                   <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                    <a href="#" (click)="exportToExcel(student)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Exportar a Excel</a>
-                    <a href="#" (click)="generateWordFile(student)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Generar archivo Word</a>
+                    <a (click)="exportToExcel(student)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 actionButton">Exportar a Excel</a>
+                    <a (click)="generateWordFile(student)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 actionButton">Generar archivo Word</a>
                   </div>
                 </div>
               </div>
@@ -56,3 +65,4 @@
   </div>
 </div>
 <app-modal-follow-ups [showModal]="showModal" [student]="selectedStudent" (closeModalEvent)="handleCloseModal()"/>
+<app-modal-student [showModalStudent]="showModalStudent" [student]="selectedStudent" (closeModalEvent)="handleCloseModalStudent()" />

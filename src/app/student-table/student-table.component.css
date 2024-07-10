@@ -144,3 +144,6 @@
     padding-right: 0.75rem;
   }
   
+  .actionButton{
+    cursor: pointer;
+  }
