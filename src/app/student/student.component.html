@@ -1,4 +1,4 @@
-<app-header [headerIsLoggedIn]="false"/>
+<app-header [headerIsLoggedIn]="false" />
 <div class="flex justify-center min-h-screen bg-gray-100 py-10">
   <form [formGroup]="studentForm">
     <div class="rounded-lg border text-card-foreground shadow-sm w-full max-w-5xl p-10 bg-white" data-v0-t="card">
@@ -8,24 +8,39 @@
       <div class="p-6">
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="student-name">NOMBRE ESTUDIANTE</label>
-            <input id="student-name" placeholder="Nombre completo" formControlName="name" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="student-name">NOMBRE ESTUDIANTE</label>
+            <input id="student-name" placeholder="Nombre completo" formControlName="name"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="rut">RUT (xxxxxxxx-x)</label>
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="rut">RUT (xxxxxxxx-x)</label>
             <div class="space-y-2">
-              <input id="rut" placeholder="Rut sin puntos y con guión" formControlName="rut" pattern="[0-9]{7,8}-[0-9kK]" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" [ngClass]="{ 'border-red-500':studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched}" />
-              <div *ngIf="studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched && studentForm.get('rut')?.errors" class="text-red-500 text-sm">Ingrese un RUT válido.</div>
+              <input id="rut" placeholder="Rut sin puntos y con guión" formControlName="rut"
+                pattern="[0-9]{7,8}-[0-9kK]"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                [ngClass]="{ 'border-red-500':studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched}" />
+              <div
+                *ngIf="studentForm.get('rut')?.invalid && studentForm.get('rut')?.touched && studentForm.get('rut')?.errors"
+                class="text-red-500 text-sm">Ingrese un RUT válido.</div>
             </div>
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">CORREO INSTITUCIONAL</label>
-            <input id="email" placeholder="Ingrese correo" type="email" formControlName="email" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" />
-            <div *ngIf="studentForm.get('email')?.invalid && studentForm.get('email')?.touched && studentForm.get('email')?.errors" class="text-red-500 text-sm">Ingrese un correo válido.</div>
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="email">CORREO INSTITUCIONAL</label>
+            <input id="email" placeholder="Ingrese correo" type="email" formControlName="email"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" />
+            <div
+              *ngIf="studentForm.get('email')?.invalid && studentForm.get('email')?.touched && studentForm.get('email')?.errors"
+              class="text-red-500 text-sm">Ingrese un correo válido.</div>
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="semester">SEMESTRE CURSA ACTUALMENTE</label>
-            <select id="semester" formControlName="semester" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="semester">SEMESTRE CURSA ACTUALMENTE</label>
+            <select id="semester" formControlName="semester"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
               <option value="" disabled selected>Seleccione semestre</option>
               <option value="Primer Semestre">Primer Semestre</option>
               <option value="Segundo Semestre">Segundo Semestre</option>
@@ -40,43 +55,74 @@
             </select>
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="sede">SEDE DEL ESTUDIANTE</label>
-            <select id="sede" formControlName="sede" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="sede">SEDE DEL ESTUDIANTE</label>
+            <select id="sede" formControlName="sede"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
               <option value="" disabled selected>Seleccione sede del estudiante</option>
               <option value="Valparaíso">Valparaíso</option>
               <option value="Santiago">Santiago</option>
               <option value="San Felipe">San Felipe</option>
             </select>
           </div>
-            <div class="space-y-2"></div>
-            <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="phone">CELULAR DE CONTACTO</label>
-              <input id="phone" placeholder="Ingrese celular de contacto" formControlName="phone" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" pattern="[0-9]{9}" />
-              <div *ngIf="studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched && studentForm.get('phone')?.errors" class="text-red-500 text-sm">Ingrese un número de celular válido.</div>
-            </div>
+          <div class="space-y-2"></div>
           <div class="space-y-2">
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="location">LUGAR</label>
-            <input id="location" placeholder="Ingrese Campus" formControlName="location" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="phone">CELULAR DE CONTACTO</label>
+            <input id="phone" placeholder="Ingrese celular de contacto" formControlName="phone"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              pattern="[0-9]{9}" />
+            <div
+              *ngIf="studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched && studentForm.get('phone')?.errors"
+              class="text-red-500 text-sm">Ingrese un número de celular válido.</div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="location">Campus</label>
+            <input id="location" placeholder="Ingrese campus del estudiante" formControlName="campus"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
           </div>
         </div>
         <div class="mt-8 space-y-4">
-          <h2 class="text-lg font-semibold">Detalles de salud</h2>
+          <h2 class="text-lg font-semibold">Detalles</h2>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="academicCharacter">CARACTER ACADÉMICO</label>
-              <input id="academicCharacter" placeholder="Ingrese motivos académicos" formControlName="academicCharacter" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="academicCharacter">CARACTER ACADÉMICO</label>
+              <input id="academicCharacter" placeholder="Ingrese motivos académicos" formControlName="academicCharacter"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="health-reasons">MOTIVOS DE SALUD</label>
-              <input id="health-reasons" placeholder="Ingrese motivos de salud" formControlName="healthReason" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="health-reasons">MOTIVOS DE SALUD</label>
+              <input id="health-reasons" placeholder="Ingrese motivos de salud" formControlName="healthReason"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="social-reasons">MOTIVOS DE ÍNDOLE SOCIAL</label>
-              <input id="social-reasons" placeholder="Ingrese motivos de índole social" formControlName="socialReason" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="social-reasons">MOTIVOS DE ÍNDOLE SOCIAL</label>
+              <input id="social-reasons" placeholder="Ingrese motivos de índole social" formControlName="socialReason"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
             </div>
             <div class="space-y-2 col-span-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="remedial-actions">ACCIONES REMEDIALES RECOMENDADAS</label>
-              <input id="remedial-actions" placeholder="Ingrese acciones remediales recomendadas" formControlName="remedialAction" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="remedial-actions">ACCIONES REMEDIALES DE PRIMERA INSTANCIA</label>
+              <input id="remedial-actions" placeholder="Ingrese acciones remediales recomendadas"
+                formControlName="remedialAction"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <div class="space-y-2 col-span-2">
+                <button type="button" class="save" (click)="toggleDropdown()">
+                  AÑADIR CERTIFICADOS
+                </button>
+                <div *ngIf="showDropdown" class="dropdown">
+                  <div *ngFor="let certificate of certificates; let i = index" class="certificate-entry">
+                    <input type="text" placeholder="Nombre del certificado" [(ngModel)]="certificate.name" />
+                    <input type="file" (change)="onFileChange($event, i)" />
+                    <button type="button" (click)="removeCertificate(i)">Eliminar</button>
+                  </div>
+                  <button type="button" (click)="addCertificate()">Añadir nuevo certificado</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
