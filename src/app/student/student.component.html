@@ -110,19 +110,19 @@
               <input id="remedial-actions" placeholder="Ingrese acciones remediales recomendadas"
                 formControlName="remedialAction"
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-              <div class="space-y-2 col-span-2">
-                <button type="button" class="save" (click)="toggleDropdown()">
-                  AÑADIR CERTIFICADOS
-                </button>
-                <div *ngIf="showDropdown" class="dropdown">
-                  <div *ngFor="let certificate of certificates; let i = index" class="certificate-entry">
-                    <input type="text" placeholder="Nombre del certificado" [(ngModel)]="certificate.name" />
-                    <input type="file" (change)="onFileChange($event, i)" />
-                    <button type="button" (click)="removeCertificate(i)">Eliminar</button>
+                <div class="space-y-2 col-span-2">
+                  <h2 class="text-lg font-semibold">Certificados</h2>
+                  <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
+                  <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload multiple>
+                  <div class="file-upload">
+                    <ul>
+                      <li *ngFor="let fileName of fileNames">{{fileName}}</li>
+                    </ul>
+                    <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()">
+                      Upload
+                    </button>
                   </div>
-                  <button type="button" (click)="addCertificate()">Añadir nuevo certificado</button>
                 </div>
-              </div>
             </div>
           </div>
         </div>

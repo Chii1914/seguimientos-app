@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormGroup, ReactiveFormsModule, Validators, FormBuilder, FormsModule} from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators, FormBuilder, FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -19,13 +19,16 @@ export class StudentComponent {
   studentForm: FormGroup;
   showDropdown = false;
   certificates: { name: string, file: File | null }[] = [];
+  fileNames: string[] = [];
+  selectedFiles: File[] = [];
+
 
 
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
   }
 
-  constructor(private fb: FormBuilder,  private http: HttpClient, private cookieService: CookieService, private router: Router) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private cookieService: CookieService, private router: Router) {
     this.studentForm = this.fb.group({
       name: ['', Validators.required],
       rut: ['', [Validators.required, Validators.pattern('[0-9]{7,8}-[0-9kK]')]],
@@ -62,11 +65,12 @@ export class StudentComponent {
         break;
       case 'saveAndExit':
         await this.save();
+        await this.saveFiles();
         this.router.navigate(['/main']);
         break;
       case 'back':
         this.router.navigate(['/main']);
-      break;
+        break;
       default:
         break;
     }
@@ -84,8 +88,40 @@ export class StudentComponent {
       alert('Estudiante creado satisfactoriamente')
     } catch (error) {
       console.log(error)
-      alert('Error al crear estudiante')}
+      alert('Error al crear estudiante')
+    }
   }
-} 
+
+  async saveFiles() {
+    try {
+      const formData = new FormData();
+      this.selectedFiles.forEach(file => {
+        formData.append('files', file, file.name);
+      });
+
+      const response = await firstValueFrom(this.http.post('http://localhost:3000/api/student/files', formData, {
+        headers: {
+          Authorization: `Bearer ${this.cookieService.getCookie('xvlf')}`
+        }
+      }));
+      alert('Archivos del estudiante subidos satisfactoriamente');
+    } catch (error) {
+      console.log(error);
+      alert('Error al subir los archivos del estudiante');
+    }
+  }
+
+  onFileSelected(event: any) {
+    const files: FileList = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const file: File = files[i];
+      if (file) {
+        this.fileNames.push(file.name);
+        this.selectedFiles.push(file);
+      }
+    }
+  }
+
+}
 
 
