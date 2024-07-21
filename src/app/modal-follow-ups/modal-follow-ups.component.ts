@@ -23,7 +23,8 @@ export class ModalFollowUpsComponent implements OnChanges {
   async fetchFollowUps(): Promise<void> {
     const headers = { Authorization: `Bearer ${this.cookieService.getCookie('xvlf')}` };
     try {
-      const response = await firstValueFrom(this.http.get(`http://localhost:3000/api/student/${this.student.rut}/follow-ups`, { headers }));
+      console.log(this.student._id);
+      const response = await firstValueFrom(this.http.get(`http://localhost:3000/api/student/${this.student._id}/follow-ups`, { headers }));
       this.followups = response;
       console.log(this.followups);
     } catch (e) {

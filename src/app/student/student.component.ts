@@ -34,7 +34,6 @@ export class StudentComponent {
       sede: ['', Validators.required],
       phone: ['', [Validators.pattern('[0-9]{9}')]],
       location: [''],
-      campus: [''],
       academicCharacter: [''],
       healthReason: [''],
       socialReason: [''],
