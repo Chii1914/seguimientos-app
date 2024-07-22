@@ -12,12 +12,14 @@ import { FormGroup, FormBuilder, Validators ,ReactiveFormsModule} from '@angular
 export class AddOrModFollowUpComponent {
   @Input() followUp: any;
   @Input() student: any;
+  
+  private studentId: string = "669ec5ff7fab6359be18d8bb";
   interviewForm: FormGroup;
 
 
   constructor(private fb: FormBuilder) {
     this.interviewForm = this.fb.group({
-      dateTime: ['', Validators.required],
+      date: ['', Validators.required],
       place: ['', Validators.required],
       campus: ['', Validators.required],
       grades: ['', Validators.required],
@@ -35,6 +37,9 @@ export class AddOrModFollowUpComponent {
     });
   }
   onSubmit() {
+    let date =  new Date(this.interviewForm.value.date);
+    this.interviewForm = {... this.interviewForm.value, date: date.toISOString()};
+    console.log(this.interviewForm);
     if (this.interviewForm.valid) {
       console.log(this.interviewForm.value);
       // Implement your submit logic here
