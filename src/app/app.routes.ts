@@ -4,6 +4,7 @@ import { MainComponent } from './main/main.component';
 import { authGuard } from './guard/auth.guard';
 import { StudentComponent } from './student/student.component';
 import { StudentTableComponent } from './student-table/student-table.component';
+import { AddOrModFollowUpComponent } from './add-or-mod-follow-up/add-or-mod-follow-up.component';
 
 export const routes: Routes = [
     {
@@ -28,6 +29,11 @@ export const routes: Routes = [
     {
         path: 'studentAll',
         component: StudentTableComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'follow',
+        component: AddOrModFollowUpComponent,
         canActivate: [authGuard]
     }
     /*

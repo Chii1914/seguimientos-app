@@ -21,6 +21,7 @@ export class StudentComponent {
   certificates: { name: string, file: File | null }[] = [];
   fileNames: string[] = [];
   selectedFiles: File[] = [];
+  studentId: string = "";
 
 
 
@@ -65,7 +66,7 @@ export class StudentComponent {
         break;
       case 'saveAndExit':
         await this.save();
-        await this.saveFiles();
+        await this.saveFiles(this.studentId);
         this.router.navigate(['/main']);
         break;
       case 'back':
@@ -80,11 +81,12 @@ export class StudentComponent {
     try {
       const formData = this.studentForm.value;
       console.log(formData)
-      const response = await firstValueFrom(this.http.post('http://localhost:3000/api/student', formData, {
+      const response = await firstValueFrom(this.http.post<any>('http://localhost:3000/api/student', formData, {
         headers: {
           Authorization: `Bearer ${this.cookieService.getCookie('xvlf')}`
         }
       }));
+      this.studentId = response._id;
       alert('Estudiante creado satisfactoriamente')
     } catch (error) {
       console.log(error)
@@ -92,14 +94,14 @@ export class StudentComponent {
     }
   }
 
-  async saveFiles() {
+  async saveFiles(studentId: string) {
     try {
       const formData = new FormData();
       this.selectedFiles.forEach(file => {
         formData.append('files', file, file.name);
       });
-
-      const response = await firstValueFrom(this.http.post('http://localhost:3000/api/student/files', formData, {
+  
+      const response = await firstValueFrom(this.http.post(`http://localhost:3000/api/student/files/${studentId}`, formData, {
         headers: {
           Authorization: `Bearer ${this.cookieService.getCookie('xvlf')}`
         }
@@ -119,6 +121,15 @@ export class StudentComponent {
         this.fileNames.push(file.name);
         this.selectedFiles.push(file);
       }
+    }
+  }
+
+  setNA(event: Event, formControlName: string) {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.studentForm.get(formControlName)?.setValue('n/a');
+    } else {
+      this.studentForm.get(formControlName)?.setValue('');
     }
   }
 

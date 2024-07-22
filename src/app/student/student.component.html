@@ -89,40 +89,53 @@
             <div class="space-y-2">
               <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="academicCharacter">CARACTER ACADÉMICO</label>
-              <input id="academicCharacter" placeholder="Ingrese motivos académicos" formControlName="academicCharacter"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <div class="flex items-center">
+                <input id="academicCharacter" placeholder="Ingrese motivos académicos"
+                  formControlName="academicCharacter"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                <input type="checkbox" (change)="setNA($event, 'academicCharacter')" class="ml-2"> No aplica
+              </div>
             </div>
             <div class="space-y-2">
               <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="health-reasons">MOTIVOS DE SALUD</label>
-              <input id="health-reasons" placeholder="Ingrese motivos de salud" formControlName="healthReason"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <div class="flex items-center">
+                <input id="health-reasons" placeholder="Ingrese motivos de salud" formControlName="healthReason"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                <input type="checkbox" (change)="setNA($event, 'healthReason')" class="ml-2"> No aplica
+              </div>
             </div>
             <div class="space-y-2">
               <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="social-reasons">MOTIVOS DE ÍNDOLE SOCIAL</label>
-              <input id="social-reasons" placeholder="Ingrese motivos de índole social" formControlName="socialReason"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+              <div class="flex items-center">
+                <input id="social-reasons" placeholder="Ingrese motivos de índole social" formControlName="socialReason"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                <input type="checkbox" (change)="setNA($event, 'socialReason')" class="ml-2"> No aplica
+              </div>
             </div>
             <div class="space-y-2 col-span-2">
               <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="remedial-actions">ACCIONES REMEDIALES DE PRIMERA INSTANCIA</label>
-              <input id="remedial-actions" placeholder="Ingrese acciones remediales recomendadas"
-                formControlName="remedialAction"
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-                <div class="space-y-2 col-span-2">
-                  <h2 class="text-lg font-semibold">Certificados</h2>
-                  <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
-                  <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload multiple>
-                  <div class="file-upload">
-                    <ul>
-                      <li *ngFor="let fileName of fileNames">{{fileName}}</li>
-                    </ul>
-                    <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()">
-                      Upload
-                    </button>
-                  </div>
-                </div>
+              <div class="flex items-center">
+                <input id="remedial-actions" placeholder="Ingrese acciones remediales recomendadas"
+                  formControlName="remedialAction"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                <input type="checkbox" (change)="setNA($event, 'remedialAction')" class="ml-2"> No aplica
+              </div>
+            </div>
+            <div class="space-y-2 col-span-2">
+              <h2 class="text-lg font-semibold">Certificados</h2>
+              <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
+              <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload multiple>
+              <div class="file-upload">
+                <ul>
+                  <li *ngFor="let fileName of fileNames">{{fileName}}</li>
+                </ul>
+                <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()">
+                  Upload
+                </button>
+              </div>
             </div>
           </div>
         </div>

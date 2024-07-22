@@ -1,1 +1,96 @@
-<p>add-or-mod-follow-up works!</p>
+<div class="container mx-auto mt-10">
+    <h2 class="text-2xl font-semibold mb-4"> Entrevista a Estudiante  </h2>
+    <form [formGroup]="interviewForm" (ngSubmit)="onSubmit()">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="dateTime">Fecha y hora:</label>
+        <input id="dateTime" type="datetime-local" formControlName="dateTime"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="place">Lugar:</label>
+        <input id="place" type="text" formControlName="place"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="campus">Campus:</label>
+        <input id="campus" type="text" formControlName="campus"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+  
+      <h3 class="text-xl font-semibold mt-6 mb-4">Antecendentes geneales del estudainte (informados por éste):</h3>
+      <div formGroupName="generalDetails">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="grades">Calificaciones (promedio a la fecha):</label>
+          <input id="grades" type="text" formControlName="grades"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="attendance">Asistencia (%):</label>
+          <input id="attendance" type="text" formControlName="attendance"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="participation">Participación en clases:</label>
+          <input id="participation" type="text" formControlName="participation"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="other">Otro (especificar):</label>
+          <input id="other" type="text" formControlName="other"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+      </div>
+  
+      <h3 class="text-xl font-semibold mt-6 mb-4">Justificación de atención</h3>
+      
+  
+      <h4 class="text-xl font-semibold mt-6 mb-4">De carácter académico:</h4>
+      <div formGroupName="academicIssues">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="comprehensionProblems">Problemas de comprensión en clases:</label>
+          <input id="comprehensionProblems" type="text" formControlName="comprehensionProblems"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="lackOfPriorKnowledge">Falta de conocimientos previos:</label>
+          <input id="lackOfPriorKnowledge" type="text" formControlName="lackOfPriorKnowledge"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+        </div>
+      </div>
+      <h4 class="text-xl font-semibold mt-6 mb-4">De salud:</h4>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="healthReasons">Motivos de salud (especificar):</label>
+        <input id="healthReasons" type="text" formControlName="healthReasons"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+      <h4 class="text-xl font-semibold mt-6 mb-4">De caracter social:</h4>
+
+      <div class="mb-4">
+        
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="socialReasons">Motivos de índole social (especificar):</label>
+        <input id="socialReasons" type="text" formControlName="socialReasons"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+      <h4 class="text-xl font-semibold mt-6 mb-4">Otro:</h4>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="otherReasons">Otro (especificar):</label>
+        <input id="otherReasons" type="text" formControlName="otherReasons"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+  
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="remedialActions">Acciones remédiales recomendadas:</label>
+        <input id="remedialActions" type="text" formControlName="remedialActions"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      </div>
+  
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+  
