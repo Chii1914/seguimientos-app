@@ -17,24 +17,21 @@ export class AddOrModFollowUpComponent {
 
   constructor(private fb: FormBuilder) {
     this.interviewForm = this.fb.group({
-      title: ['Entrevista personal a estudiante', Validators.required],
       dateTime: ['', Validators.required],
       place: ['', Validators.required],
       campus: ['', Validators.required],
-      generalDetails: this.fb.group({
-        grades: ['', Validators.required],
-        attendance: ['', Validators.required],
-        participation: ['', Validators.required],
-        other: ['']
-      }),
-      academicIssues: this.fb.group({
-        comprehensionProblems: ['', Validators.required],
-        lackOfPriorKnowledge: ['', Validators.required]
-      }),
+      grades: ['', Validators.required],
+      attendance: ['', Validators.required],
+      participation: ['', Validators.required],
+      other: [''],
+      justification: ['', Validators.required],
+      comprehensionProblems: ['', Validators.required],
+      lackOfPriorKnowledge: ['', Validators.required],
       healthReasons: [''],
       socialReasons: [''],
       otherReasons: [''],
-      remedialActions: ['', Validators.required]
+      remedialActions: ['', Validators.required],
+      notes: ['']
     });
   }
   onSubmit() {
