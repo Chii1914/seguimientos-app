@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators ,ReactiveFormsModule} from '@angular/forms';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -9,15 +10,28 @@ import { FormGroup, FormBuilder, Validators ,ReactiveFormsModule} from '@angular
   templateUrl: './add-or-mod-follow-up.component.html',
   styleUrl: './add-or-mod-follow-up.component.css'
 })
-export class AddOrModFollowUpComponent {
-  @Input() followUp: any;
-  @Input() student: any;
+export class AddOrModFollowUpComponent implements OnInit{
+  studentId: any;
+  followUp: any;
   
-  private studentId: string = "669ec5ff7fab6359be18d8bb";
+  //private studentId: string = "669ec5ff7fab6359be18d8bb";
   interviewForm: FormGroup;
 
 
-  constructor(private fb: FormBuilder) {
+  ngOnInit(): void {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation && navigation.extras && navigation.extras.state) {
+      const state = navigation.extras.state as { studentId?: any };  
+      this.studentId = state?.studentId ?? null;
+      console.log('Received studentId in follow component:', this.studentId);
+    } else {
+      console.error('Navigation state is not available.');
+    }
+  }
+  
+  
+
+  constructor(private fb: FormBuilder, private router: Router) {
     this.interviewForm = this.fb.group({
       date: ['', Validators.required],
       place: ['', Validators.required],
@@ -36,16 +50,23 @@ export class AddOrModFollowUpComponent {
       notes: ['']
     });
   }
+  
+  debug(){
+    console.log(this.studentId);
+  }
+
   onSubmit() {
     let date =  new Date(this.interviewForm.value.date);
     this.interviewForm = {... this.interviewForm.value, date: date.toISOString()};
     console.log(this.interviewForm);
     if (this.interviewForm.valid) {
       console.log(this.interviewForm.value);
-      // Implement your submit logic here
     } else {
-      alert('Please fill out all required fields.');
+      alert('Porfavor rellene todos los campos.');
     }
+  }
+  exit(){
+    this.router.navigate(['/main']);
   }
 }
 

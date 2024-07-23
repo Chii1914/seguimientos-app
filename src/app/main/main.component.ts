@@ -25,7 +25,16 @@ export class MainComponent {
 
     });
   }
-  
+
+  debug() {
+    const cookieValue = this.cookieService.getCookie('xvlf');
+    console.log(cookieValue);
+    navigator.clipboard.writeText(cookieValue || "").then(() => {
+      console.log('Cookie value copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy cookie value: ', err);
+    });
+  }  
   navSeg() {
     this.router.navigate(['/studentAll']);
   }

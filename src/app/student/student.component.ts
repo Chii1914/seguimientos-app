@@ -63,6 +63,9 @@ export class StudentComponent {
   async onSubmit(event: Event, action: string) {
     switch (action) {
       case 'saveAndFollowUp':
+        await this.save();
+        await this.saveFiles(this.studentId);
+        this.router.navigate(['/follow'], { state: { studentId: this.studentId } });
         break;
       case 'saveAndExit':
         await this.save();
@@ -71,6 +74,9 @@ export class StudentComponent {
         break;
       case 'back':
         this.router.navigate(['/main']);
+        break;
+      case 'deb':
+        this.router.navigate(['/follow'], { state: { studentId: "YOEL STRING" } });
         break;
       default:
         break;
