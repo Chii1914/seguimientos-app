@@ -86,11 +86,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Sistema de seguimientos
+            Sistema de Seguimientos
           </Typography>
           <Button color="inherit">Cerrar sesión</Button>
-          <Button color="inherit">Volver a APU</Button>
-
         </Toolbar>
       </AppBar>
       <Drawer

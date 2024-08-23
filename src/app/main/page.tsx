@@ -5,7 +5,7 @@ export default function Page() {
   
   return (
     <>
-        <h1>BIENVENIDO AL DASHBOAR MÁS ORDINARIOO</h1>
+        <h1>Aquí irán las instrucciones para el sistema de seguimientos</h1>
     </>
   );
 }
