@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper } from "@mui/material";
+import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper, Modal } from "@mui/material";
 import { useState } from 'react';
 import axios from 'axios';
 
@@ -21,8 +21,15 @@ export default function Table() {
     motherLastName: '',
     sede: '',
   });
+  const [files, setFiles] = useState([]); // State to store selected files
 
-  const [selectedReason, setSelectedReason] = useState(''); // State to store the selected reason type
+  const [studentId, setStudentId] = useState(''); // State to store the student ID
+  const [selectedReason, setSelectedReason] = useState('');
+  const [openModal, setOpenModal] = useState(false); // State to control modal visibility
+  const [followUpData, setFollowUpData] = useState({ // State to store follow-up data
+    date: '',
+    notes: ''
+  });
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -47,6 +54,17 @@ export default function Table() {
     try {
       if (type === "add" || type === "addFollow") {
         const response = await axios.post('http://localhost:3000/api/student', studentData);
+        console.log('Student added successfully:', response.data);
+
+        // Store the student ID from the response
+        const studentId = response.data._id;
+
+        // Check if there are files to upload
+        if (files.length > 0) {
+          await handleFileUpload(studentId);
+        }
+
+        // Reset form after adding the student
         setStudentData({
           rut: '',
           df: '',
@@ -65,14 +83,50 @@ export default function Table() {
           sede: '',
         });
 
-        setSelectedReason(''); 
+        setSelectedReason(''); // Reset the selected reason
 
         if (type === "addFollow") {
-          console.log("Estudiante añadido y añadir seguimiento");
+          setOpenModal(true); // Open the modal for adding follow-up
+          setStudentId(studentId); // Store the student ID in state for later use
         }
       }
     } catch (error) {
       console.error('Error adding student:', error);
+    }
+  };
+
+
+
+  const handleAddFollowUp = async () => {
+    try {
+      // Use the stored student ID to add the follow-up
+      const followUpResponse = await axios.post('http://localhost:3000/api/student/add-follow-up', {
+        id: studentId, // Use the stored student ID
+        follow_up: followUpData // Follow-up data
+      });
+
+      console.log('Follow-up added successfully:', followUpResponse.data);
+
+      // Reset follow-up data and close modal
+      setFollowUpData({ date: '', notes: '' });
+      setOpenModal(false);
+    } catch (error) {
+      console.error('Error adding follow-up:', error);
+    }
+  };
+  const handleFileUpload = async (studentId: string) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file)); // Append each selected file to the form data
+
+    try {
+      const uploadResponse = await axios.post(`http://localhost:3000/api/student/files/${studentId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log('Files uploaded successfully:', uploadResponse.data);
+    } catch (error) {
+      console.error('Error uploading files:', error);
     }
   };
 
@@ -166,7 +220,6 @@ export default function Table() {
                 <MenuItem value="socialReason">Razón Social</MenuItem>
               </Select>
             </Grid>
-            {/* Conditional inputs based on selected reason */}
             {selectedReason === 'academicCharacter' && (
               <Grid item xs={12}>
                 <TextField
@@ -267,18 +320,126 @@ export default function Table() {
                   <MenuItem key={sede} value={sede}>{sede}</MenuItem>
                 ))}
               </Select>
+              <Grid item xs={12}>
+                <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Certificados</Typography>
+                <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => setFiles(Array.from(e.target.files))}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Button variant="contained" color="primary" onClick={() => handleSubmit("add")}>
+                  Agregar Estudiante
+                </Button>
+                <Button variant="contained" color="primary" onClick={() => handleSubmit("addFollow")}>
+                  Agregar Estudiante y añadir un seguimiento
+                </Button>
+              </Grid>
+
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={() => handleSubmit("add")}>
-                Agregar Estudiante
-              </Button>
-              <Button variant="contained" color="primary" onClick={() => handleSubmit("addFollow")}>
-                Agregar Estudiante y añadir un seguimiento
-              </Button>
-            </Grid>
+            
           </Grid>
         </Box>
+        <Modal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          aria-labelledby="follow-up-modal-title"
+          aria-describedby="follow-up-modal-description"
+        >
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            p: 4,
+            width: 400
+          }}>
+            <Typography id="follow-up-modal-title" variant="h6" component="h2">
+              Añadir Seguimiento
+            </Typography>
+            <TextField
+              label="Fecha"
+              type="date"
+              name="date"
+              value={followUpData.date}
+              onChange={(e) => setFollowUpData({ ...followUpData, date: e.target.value })}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <TextField
+              label="Notas"
+              name="notes"
+              value={followUpData.notes}
+              onChange={(e) => setFollowUpData({ ...followUpData, notes: e.target.value })}
+              fullWidth
+              margin="normal"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddFollowUp}
+              sx={{ mt: 2 }}
+            >
+              Añadir Seguimiento
+            </Button>
+          </Box>
+        </Modal>
       </main>
+      <Modal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        aria-labelledby="follow-up-modal-title"
+        aria-describedby="follow-up-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          p: 4,
+          width: 400
+        }}>
+          <Typography id="follow-up-modal-title" variant="h6" component="h2" color='black'>
+            Añadir Seguimiento
+          </Typography>
+          <TextField
+            label="Fecha"
+            type="date"
+            name="date"
+            value={followUpData.date}
+            onChange={(e) => setFollowUpData({ ...followUpData, date: e.target.value })}
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+          <TextField
+            label="Notas"
+            name="notes"
+            value={followUpData.notes}
+            onChange={(e) => setFollowUpData({ ...followUpData, notes: e.target.value })}
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddFollowUp}
+            sx={{ mt: 2 }}
+          >
+            Añadir Seguimiento
+          </Button>
+        </Box>
+      </Modal>
     </Paper>
   );
 }

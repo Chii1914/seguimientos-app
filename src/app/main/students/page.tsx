@@ -7,7 +7,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [followUps, setFollowUps] = useState([]); // State to store follow-ups
-
+  const [fileNames, setFileNames] = useState([]); // State to store file names
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [openModal, setOpenModal] = useState(false);
   const [menuAnchorEls, setMenuAnchorEls] = useState<Record<string, HTMLElement | null>>({});
@@ -50,6 +50,7 @@ export default function Students() {
     }
   };
 
+
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: string) => {
     setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
   };
@@ -58,14 +59,24 @@ export default function Students() {
     setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
   };
 
-  const handleModalOpen = (student: any) => {
+  const handleModalOpen = async (student: any) => {
     setSelectedStudent(student);
     setOpenModal(true);
+
+    try {
+      // Fetch file names for the selected student
+      const response = await axios.get(`http://localhost:3000/api/student/${student._id}/filenames`);
+      setFileNames(response.data);
+    } catch (error) {
+      console.error('Error fetching file names:', error);
+    }
   };
+
 
   const handleModalClose = () => {
     setOpenModal(false);
     setSelectedStudent(null);
+    setFileNames([]);
   };
 
   // Handle changes to text fields
@@ -318,6 +329,20 @@ export default function Students() {
                   </MenuItem>
                 ))}
               </Select>
+              <Paper sx={{ mt: 4, p: 2 }}>
+                <Box sx={{ mt: 4 }}>
+                  <Typography variant="h6">Archivos Subidos</Typography>
+                  {fileNames.length > 0 ? (
+                    <ul>
+                      {fileNames.map((fileName, index) => (
+                        <li key={index}>{fileName}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <Typography variant="body2">No hay archivos subidos para este estudiante</Typography>
+                  )}
+                </Box>
+              </Paper>
 
               <Paper sx={{ mt: 4, p: 2 }}>
                 <Box sx={{ mt: 4 }}>
