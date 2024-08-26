@@ -1,49 +1,113 @@
-"use client";
-import { Box, Button, Card, Grid, Paper, Typography } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import React from "react";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-
+'use client';
+import React, { useState } from "react";
+import { Box, Button, Typography, Menu, MenuItem, Modal } from "@mui/material";
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 export default function Students() {
-
   const students = [
-    { name: 'Alice', semester: '5th', numberIdentity: '123456' },
-    { name: 'Bob', semester: '6th', numberIdentity: '789012' },
-    { name: 'Charlie', semester: '4th', numberIdentity: '345678' },
+    { id: 1, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '5th', rut: '123456', 'df': '4' },
+    { id: 2, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '6th', rut: '789012', 'df': '3' },
+    { id: 3, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '4th', rut: '345678', 'df': '2' },
   ];
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedStudent, setSelectedStudent] = React.useState<{ name: string; semester: string; numberIdentity: string } | null>(null);
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<{
+    name: string;
+    secondName: string;
+    fatherLastName: string;
+    motherLastName: string;
+    semester: string;
+    rut: string;
+    df: string
+  } | null>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [menuAnchorEls, setMenuAnchorEls] = useState<Record<number, HTMLElement | null>>({});
 
-  const openMenu = Boolean(anchorEl);
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
   };
 
-  const handleDialogOpen = (student: any) => {
+  const handleMenuClose = (studentId: number) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
+  };
+
+  const handleModalOpen = (student: any) => {
     setSelectedStudent(student);
-    setOpenDialog(true);
+    setOpenModal(true);
   };
 
-  const handleDialogClose = () => {
-    setOpenDialog(false);
+  const handleModalClose = () => {
+    setOpenModal(false);
     setSelectedStudent(null);
+  };
+
+  // Define columns for DataGrid
+  const columns: GridColDef[] = [
+    { field: 'fatherLastName', headerName: 'Apellido Paterno', width: 150 },
+    { field: 'motherLastName', headerName: 'Apellido Materno', width: 150 },
+    { field: 'name', headerName: 'Nombre', width: 150 },
+    { field: 'secondName', headerName: 'Segundo Nombre', width: 150 },
+    { field: 'semester', headerName: 'Semestre', width: 100 },
+    { field: 'rut', headerName: 'RUT', width: 150 },
+    {
+      field: 'actions',
+      headerName: 'Acciones',
+      width: 300,
+      renderCell: (params: GridRenderCellParams) => {
+        const isMenuOpen = Boolean(menuAnchorEls[params.row.id]);
+
+        return (
+          <Box>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleModalOpen(params.row)}
+            >
+              Ver Alumno
+            </Button>
+            <Button
+              aria-controls={isMenuOpen ? 'demo-positioned-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen ? 'true' : undefined}
+              onClick={(event) => handleMenuClick(event, params.row.id)}
+            >
+              Exportar
+            </Button>
+            <Menu
+              id="demo-positioned-menu"
+              anchorEl={menuAnchorEls[params.row.id]}
+              open={isMenuOpen}
+              onClose={() => handleMenuClose(params.row.id)}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={() => handleMenuClose(params.row.id)}>Exportar a excel</MenuItem>
+              <MenuItem onClick={() => handleMenuClose(params.row.id)}>Exportar a word</MenuItem>
+            </Menu>
+          </Box>
+        );
+      },
+      sortable: false,  // Optional: disable sorting for this column
+      filterable: false // Optional: disable filtering for this column
+    },
+  ];
+
+  // Modal styling
+  const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
   };
 
   return (
@@ -52,80 +116,35 @@ export default function Students() {
         <Button>Exportar todos los estudiantes</Button>
         <Button>Exportar por rango de fecha</Button>
       </Box>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Semestre</TableCell>
-                <TableCell>RUT</TableCell>
-                <TableCell>Acciones</TableCell>
-                <TableCell width="100px">Exportar</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {students.map((student, index) => (
-                <TableRow key={index}>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.semester}</TableCell>
-                  <TableCell>{student.numberIdentity}</TableCell>
-                  <TableCell>
-                    <Button variant="contained" color="primary" onClick={() => handleDialogOpen(student)}>
-                      Ver Alumno
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      id="demo-positioned-button"
-                      aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={openMenu ? 'true' : undefined}
-                      onClick={handleMenuClick}
-                    >
-                      Exportar
-                    </Button>
-                    <Menu
-                      id="demo-positioned-menu"
-                      aria-labelledby="demo-positioned-button"
-                      anchorEl={anchorEl}
-                      open={openMenu}
-                      onClose={handleMenuClose}
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                      }}
-                    >
-                      <MenuItem onClick={handleMenuClose}>Exportar a excel</MenuItem>
-                      <MenuItem onClick={handleMenuClose}>Exportar a word</MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </main>
+      <Box sx={{ height: 400, width: '100%' }}>
+        <DataGrid
+          rows={students}
+          columns={columns}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
+      </Box>
 
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>Información del Alumno</DialogTitle>
-        <DialogContent>
+      <Modal open={openModal} onClose={handleModalClose}>
+        <Box sx={modalStyle}>
+          <Typography variant="h4" component="h2">
+            Información del Alumno
+          </Typography>
           {selectedStudent && (
             <>
-              <Typography>Nombre: {selectedStudent.name}</Typography>
+              <Typography typography='h5'>Nombre: {selectedStudent.name}</Typography>
+              <Typography typography='h5'>Segundo Nombre: {selectedStudent.secondName}</Typography>
+              <Typography typography='h5'>Apellido Paterno: {selectedStudent.fatherLastName}</Typography>
+              <Typography typography='h5'>Apellido Materno: {selectedStudent.motherLastName}</Typography>
+
               <Typography>Semestre: {selectedStudent.semester}</Typography>
-              <Typography>RUT: {selectedStudent.numberIdentity}</Typography>
+              <Typography>RUT: {selectedStudent.rut}</Typography>
+
             </>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">Cerrar</Button>
-        </DialogActions>
-      </Dialog>
+          <Button onClick={handleModalClose} color="primary">Cerrar</Button>
+        </Box>
+      </Modal>
     </>
   );
 }
