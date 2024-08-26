@@ -5,8 +5,8 @@ import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Selec
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 export default function Students() {
-  const [students, setStudents] = useState([]);
-  const [followUps, setFollowUps] = useState([]); // State to store follow-ups
+  const [students, setStudents] = useState<any[]>([]);
+  const [followUps, setFollowUps] = useState<any[]>([]); // State to store follow-ups
   const [fileNames, setFileNames] = useState([]); // State to store file names
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [openModal, setOpenModal] = useState(false);
@@ -174,7 +174,6 @@ export default function Students() {
           <DataGrid
             rows={students}
             columns={columns}
-            disableSelectionOnClick
             getRowId={(row) => row._id}  // Use _id as the unique row identifier
             sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
           />
@@ -239,7 +238,7 @@ export default function Students() {
                 value={selectedStudent.df || ''}
                 onChange={(e) => handleChange('df', e.target.value)}
                 fullWidth
-                margin="normal"
+                margin="dense"
               >
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'K'].map((df) => (
                   <MenuItem key={df} value={df}>
@@ -254,7 +253,7 @@ export default function Students() {
                 value={selectedStudent.semester || ''}
                 onChange={(e) => handleChange('semester', e.target.value)}
                 fullWidth
-                margin="normal"
+                margin="dense"
               >
                 {[
                   'Primer Semestre', 'Segundo Semestre', 'Tercer Semestre', 'Cuarto Semestre',
@@ -321,7 +320,7 @@ export default function Students() {
                 value={selectedStudent.sede || ''}
                 onChange={(e) => handleChange('sede', e.target.value)}
                 fullWidth
-                margin="normal"
+                margin="dense"
               >
                 {['Valparaíso', 'Santiago', 'San Felipe'].map((sede) => (
                   <MenuItem key={sede} value={sede}>

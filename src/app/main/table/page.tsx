@@ -21,7 +21,7 @@ export default function Table() {
     motherLastName: '',
     sede: '',
   });
-  const [files, setFiles] = useState([]); // State to store selected files
+  const [files, setFiles] = useState<File[]>([]); // Specify the type as an array of File objects
 
   const [studentId, setStudentId] = useState(''); // State to store the student ID
   const [selectedReason, setSelectedReason] = useState('');
@@ -106,7 +106,7 @@ export default function Table() {
       });
 
       console.log('Follow-up added successfully:', followUpResponse.data);
-
+      console.log(followUpData)
       // Reset follow-up data and close modal
       setFollowUpData({ date: '', notes: '' });
       setOpenModal(false);
@@ -326,7 +326,12 @@ export default function Table() {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => setFiles(Array.from(e.target.files))}
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files) {
+                      setFiles(Array.from(files));
+                    }
+                  }}
                 />
               </Grid>
 
