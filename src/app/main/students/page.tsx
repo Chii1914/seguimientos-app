@@ -1,15 +1,11 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 export default function Students() {
-  const students = [
-    { id: 1, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '5th', rut: '123456', 'df': '4' },
-    { id: 2, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '6th', rut: '789012', 'df': '3' },
-    { id: 3, name: 'Aa', secondName: 'Bb', fatherLastName: 'Cc', motherLastName: 'Dd', semester: '4th', rut: '345678', 'df': '2' },
-  ];
-
+  const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState<{
     name: string;
     secondName: string;
@@ -21,6 +17,17 @@ export default function Students() {
   } | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [menuAnchorEls, setMenuAnchorEls] = useState<Record<number, HTMLElement | null>>({});
+
+  useEffect(() => {
+    // Fetch data from the API when the component mounts
+    axios.get('http://localhost:3000/api/students')
+      .then(response => {
+        setStudents(response.data);  // Update state with the fetched data
+      })
+      .catch(error => {
+        console.error('Error fetching students:', error);
+      });
+  }, []);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: number) => {
     setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
@@ -92,8 +99,8 @@ export default function Students() {
           </Box>
         );
       },
-      sortable: false,  // Optional: disable sorting for this column
-      filterable: false // Optional: disable filtering for this column
+      sortable: false,
+      filterable: false
     },
   ];
 
@@ -120,8 +127,7 @@ export default function Students() {
         <DataGrid
           rows={students}
           columns={columns}
-          checkboxSelection
-          disableRowSelectionOnClick
+          disableSelectionOnClick
         />
       </Box>
 
