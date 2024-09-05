@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 export default function Students() {
@@ -40,25 +40,6 @@ export default function Students() {
       });
   }, []);
 
-  const fetchFollowUps = async (studentId: string) => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/student/${studentId}/follow-ups`);
-      setFollowUps(response.data);
-      console.log(response.data)
-    } catch (error) {
-      console.error('Error fetching follow-ups:', error);
-    }
-  };
-
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: string) => {
-    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
-  };
-
-  const handleMenuClose = (studentId: string) => {
-    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
-  };
-
   const handleModalOpen = async (student: any) => {
     setSelectedStudent(student);
     setOpenModal(true);
@@ -72,15 +53,14 @@ export default function Students() {
     }
   };
 
-
   const handleModalClose = () => {
     setOpenModal(false);
     setSelectedStudent(null);
     setFileNames([]);
   };
 
-  // Handle changes to text fields
-  const handleChange = (key: string, value: string) => {
+  // Handle changes to text fields and checkboxes
+  const handleChange = (key: string, value: string | boolean) => {
     setSelectedStudent((prev: any) => ({ ...prev, [key]: value }));
   };
 
@@ -88,7 +68,6 @@ export default function Students() {
   const handleUpdate = () => {
     if (!selectedStudent) return;
 
-    // Destructure and remove _id, follow_ups, and __v
     const { _id, follow_ups, __v, ...studentData } = selectedStudent;
 
     axios.patch(`http://localhost:3000/api/student/${_id}`, studentData)
@@ -119,42 +98,11 @@ export default function Students() {
       headerName: 'Acciones',
       width: 300,
       renderCell: (params: GridRenderCellParams) => {
-        const isMenuOpen = Boolean(menuAnchorEls[params.row._id]);
-
         return (
           <Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleModalOpen(params.row)}
-            >
+            <Button variant="contained" color="primary" onClick={() => handleModalOpen(params.row)}>
               Ver Alumno
             </Button>
-            <Button
-              aria-controls={isMenuOpen ? 'demo-positioned-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={isMenuOpen ? 'true' : undefined}
-              onClick={(event) => handleMenuClick(event, params.row._id)}
-            >
-              Exportar
-            </Button>
-            <Menu
-              id="demo-positioned-menu"
-              anchorEl={menuAnchorEls[params.row._id]}
-              open={isMenuOpen}
-              onClose={() => handleMenuClose(params.row._id)}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-            >
-              <MenuItem onClick={() => handleMenuClose(params.row._id)}>Exportar a excel</MenuItem>
-              <MenuItem onClick={() => handleMenuClose(params.row._id)}>Exportar a word</MenuItem>
-            </Menu>
           </Box>
         );
       },
@@ -166,16 +114,26 @@ export default function Students() {
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ mb: 2, px: 2 }}>
-        <Button>Exportar todos los estudiantes</Button>
-        <Button>Exportar por rango de fecha</Button>
+        <Button variant="outlined" color="primary">Exportar todos los estudiantes</Button>
+        <Button variant="outlined" color="secondary" sx={{ ml: 2 }}>Exportar por rango de fecha</Button>
       </Box>
       <Box sx={{ flexGrow: 1 }}>
-        <Paper>
+        <Paper elevation={3}>
           <DataGrid
             rows={students}
             columns={columns}
-            getRowId={(row) => row._id}  // Use _id as the unique row identifier
-            sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
+            getRowId={(row) => row._id}
+            sx={{
+              height: '100%',
+              width: '100%',
+              backgroundColor: '#f5f5f5', // Light grey background
+              '& .MuiDataGrid-columnHeaderTitle': {
+                color: '#000', // Black text color for headers
+              },
+              '& .MuiDataGrid-cell': {
+                color: '#000', // Black text color for cells
+              },
+            }}
           />
         </Paper>
       </Box>
@@ -187,7 +145,8 @@ export default function Students() {
             left: 0,
             width: '100%',
             height: '100%',
-            bgcolor: 'background.paper',
+            bgcolor: '#ffffff', // White background for modal
+            color: '#000000', // Black text color
             overflow: 'auto',
             padding: 4,
           }}
@@ -203,6 +162,7 @@ export default function Students() {
                 onChange={(e) => handleChange('name', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
               />
               <TextField
                 label="Segundo Nombre"
@@ -210,6 +170,7 @@ export default function Students() {
                 onChange={(e) => handleChange('secondName', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
               <TextField
                 label="Apellido Paterno"
@@ -217,6 +178,7 @@ export default function Students() {
                 onChange={(e) => handleChange('fatherLastName', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
               <TextField
                 label="Apellido Materno"
@@ -224,6 +186,7 @@ export default function Students() {
                 onChange={(e) => handleChange('motherLastName', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
               <TextField
                 label="RUT"
@@ -231,14 +194,18 @@ export default function Students() {
                 onChange={(e) => handleChange('rut', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
-              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Dígito Verificador</Typography>
+
+              {/* Use black for typography and handle contrast for labels */}
+              <Typography variant="h6" sx={{ color: '#000', marginTop: '3px', marginBottom: '3px' }}>Dígito Verificador</Typography>
               <Select
                 label="DF"
                 value={selectedStudent.df || ''}
                 onChange={(e) => handleChange('df', e.target.value)}
                 fullWidth
                 margin="dense"
+                sx={{ bgcolor: '#f9f9f9' }}
               >
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'K'].map((df) => (
                   <MenuItem key={df} value={df}>
@@ -246,14 +213,15 @@ export default function Students() {
                   </MenuItem>
                 ))}
               </Select>
-              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Semestre</Typography>
 
+              <Typography variant="h6" sx={{ color: '#000', marginTop: '3px', marginBottom: '3px' }}>Semestre</Typography>
               <Select
                 label="Semestre"
                 value={selectedStudent.semester || ''}
                 onChange={(e) => handleChange('semester', e.target.value)}
                 fullWidth
                 margin="dense"
+                sx={{ bgcolor: '#f9f9f9' }}
               >
                 {[
                   'Primer Semestre', 'Segundo Semestre', 'Tercer Semestre', 'Cuarto Semestre',
@@ -265,12 +233,14 @@ export default function Students() {
                   </MenuItem>
                 ))}
               </Select>
+
               <TextField
                 label="Email"
                 value={selectedStudent.email || ''}
                 onChange={(e) => handleChange('email', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
               <TextField
                 label="Teléfono"
@@ -278,6 +248,7 @@ export default function Students() {
                 onChange={(e) => handleChange('phone', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
               <TextField
                 label="Ubicación"
@@ -285,49 +256,183 @@ export default function Students() {
                 onChange={(e) => handleChange('location', e.target.value)}
                 fullWidth
                 margin="normal"
+                sx={{ bgcolor: '#f9f9f9' }}
               />
-              <TextField
-                label="Carácter Académico"
-                value={selectedStudent.academicCharacter || ''}
-                onChange={(e) => handleChange('academicCharacter', e.target.value)}
-                fullWidth
-                margin="normal"
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.consumoSustancias || false} onChange={(e) => handleChange('consumoSustancias', e.target.checked)} />}
+                label="Consumo Problemático de Sustancias"
               />
-              <TextField
-                label="Razón de Salud"
-                value={selectedStudent.healthReason || ''}
-                onChange={(e) => handleChange('healthReason', e.target.value)}
-                fullWidth
-                margin="normal"
+              {selectedStudent.consumoSustancias && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justConsumoSustancias || ''}
+                  onChange={(e) => handleChange('justConsumoSustancias', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Convivencia y Buen Trato" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.convivencia || false} onChange={(e) => handleChange('convivencia', e.target.checked)} />}
+                label="Convivencia y Buen Trato"
               />
-              <TextField
-                label="Razón Social"
-                value={selectedStudent.socialReason || ''}
-                onChange={(e) => handleChange('socialReason', e.target.value)}
-                fullWidth
-                margin="normal"
+              {selectedStudent.convivencia && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justConvivencia || ''}
+                  onChange={(e) => handleChange('justConvivencia', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Emocional y Académico" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.emocionalYAcademico || false} onChange={(e) => handleChange('emocionalYAcademico', e.target.checked)} />}
+                label="Emocional y Académico"
               />
-              <TextField
-                label="Acción Remedial"
-                value={selectedStudent.remedialAction || ''}
-                onChange={(e) => handleChange('remedialAction', e.target.value)}
-                fullWidth
-                margin="normal"
+              {selectedStudent.emocionalYAcademico && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEmocionalYAcademico || ''}
+                  onChange={(e) => handleChange('justEmocionalYAcademico', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Emocional" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.emocional || false} onChange={(e) => handleChange('emocional', e.target.checked)} />}
+                label="Emocional"
               />
-              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Sede</Typography>
-              <Select
-                label="Sede"
-                value={selectedStudent.sede || ''}
-                onChange={(e) => handleChange('sede', e.target.value)}
-                fullWidth
-                margin="dense"
-              >
-                {['Valparaíso', 'Santiago', 'San Felipe'].map((sede) => (
-                  <MenuItem key={sede} value={sede}>
-                    {sede}
-                  </MenuItem>
-                ))}
-              </Select>
+              {selectedStudent.emocional && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEmocional || ''}
+                  onChange={(e) => handleChange('justEmocional', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Académico" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.academico || false} onChange={(e) => handleChange('academico', e.target.checked)} />}
+                label="Académico"
+              />
+              {selectedStudent.academico && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justAcademico || ''}
+                  onChange={(e) => handleChange('justAcademico', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "UV Inclusiva (Neurodivergencia)" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.uvinclusiva || false} onChange={(e) => handleChange('uvinclusiva', e.target.checked)} />}
+                label="UV Inclusiva (Neurodivergencia)"
+              />
+              {selectedStudent.uvinclusiva && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justUvinclusiva || ''}
+                  onChange={(e) => handleChange('justUvinclusiva', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Violencia Física-Psicológica, Abuso" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.abuso || false} onChange={(e) => handleChange('abuso', e.target.checked)} />}
+                label="Violencia Física-Psicológica, Abuso"
+              />
+              {selectedStudent.abuso && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justAbuso || ''}
+                  onChange={(e) => handleChange('justAbuso', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Económicos" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.economicos || false} onChange={(e) => handleChange('economicos', e.target.checked)} />}
+                label="Económicos"
+              />
+              {selectedStudent.economicos && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEconomicos || ''}
+                  onChange={(e) => handleChange('justEconomicos', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Económico, Emocional y Académico" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.economicoEmocionalAcademico || false} onChange={(e) => handleChange('economicoEmocionalAcademico', e.target.checked)} />}
+                label="Económico, Emocional y Académico"
+              />
+              {selectedStudent.economicoEmocionalAcademico && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEconomicoEmocionalAcademico || ''}
+                  onChange={(e) => handleChange('justEconomicoEmocionalAcademico', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Económico y Emocional" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.economicoEmocional || false} onChange={(e) => handleChange('economicoEmocional', e.target.checked)} />}
+                label="Económico y Emocional"
+              />
+              {selectedStudent.economicoEmocional && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEconomicoEmocional || ''}
+                  onChange={(e) => handleChange('justEconomicoEmocional', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
+              {/* Checkbox and justification for "Económico y Académico" */}
+              <FormControlLabel
+                control={<Checkbox checked={selectedStudent.economicoAcademico || false} onChange={(e) => handleChange('economicoAcademico', e.target.checked)} />}
+                label="Económico y Académico"
+              />
+              {selectedStudent.economicoAcademico && (
+                <TextField
+                  label="Justificación"
+                  value={selectedStudent.justEconomicoAcademico || ''}
+                  onChange={(e) => handleChange('justEconomicoAcademico', e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ bgcolor: '#f9f9f9' }}
+                />
+              )}
+
               <Paper sx={{ mt: 4, p: 2 }}>
                 <Box sx={{ mt: 4 }}>
                   <Typography variant="h6">Archivos Subidos</Typography>
@@ -361,21 +466,18 @@ export default function Students() {
                 </Box>
               </Paper>
 
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Button onClick={handleUpdate} variant="contained" color="primary" sx={{ mr: 2 }}>
+                  Modificar
+                </Button>
+                <Button onClick={handleModalClose} color="secondary">
+                  Cerrar
+                </Button>
+              </Box>
             </>
           )}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button onClick={handleUpdate} variant="contained" color="primary" sx={{ mr: 2 }}>
-              Modificar
-            </Button>
-            <Button onClick={handleModalClose} color="secondary">
-              Cerrar
-            </Button>
-          </Box>
         </Box>
       </Modal>
-
-
-
     </Box>
   );
 }
