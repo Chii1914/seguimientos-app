@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
 export default function Students() {
   const [students, setStudents] = useState<any[]>([]);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [followUps, setFollowUps] = useState<any[]>([]); // State to store follow-ups
   const [fileNames, setFileNames] = useState([]); // State to store file names
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
@@ -14,9 +15,50 @@ export default function Students() {
   const [studentId, setStudentId] = useState('');
   const [menuAnchorEls, setMenuAnchorEls] = useState<Record<string, HTMLElement | null>>({});
   const [files, setFiles] = useState<File[]>([]);
+  const [reload, setReload] = useState(false); // State to trigger re-fetch
+  const [filteredStudents, setFilteredStudents] = useState<any[]>([]);
+  const [filters, setFilters] = useState({
+    consumoSustancias: false,
+    convivencia: false,
+    emocional: false,
+    academico: false,
+    uvinclusiva: false,
+    abuso: false,
+    economicos: false,
+    emocionalYAcademico: false,
+    economicoEmocionalAcademico: false,
+    economicoEmocional: false,
+    economicoAcademico: false,
+  });
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setFilters((prevFilters) => ({ ...prevFilters, [name]: checked }));
+  };
+  useEffect(() => {
+    const filtered = students.filter((student) => {
+      return Object.keys(filters).every((key) => {
+        if (filters[key as keyof typeof filters]) {
+          return student[key] === true;
+        }
+        return true;
+      });
+    });
+    setFilteredStudents(filtered);
+  }, [filters, students]);
+
   const [followUpData, setFollowUpData] = useState({
     date: '',
-    notes: ''
+    notes: '',
+    asistentaSocial: false,
+    justAsistentaSocial: 'none',
+    ajusteAcademico: false,
+    justAjusteAcademico: 'none',
+    documentoRespaldo: false,
+    justDocumentoRespaldo: 'none',
+    noAceptaIndicaciones: false,
+    justNoAceptaIndicaciones: 'none',
+    otro: 'none',
   });
 
 
@@ -45,18 +87,103 @@ export default function Students() {
       .catch(error => {
         console.error('Error fetching students:', error);
       });
-  }, []);
+  }, [reload]);
+
+  useEffect(() => {
+    const filtered = students.filter((student) => {
+      // Apply the boolean filters
+      return Object.keys(filters).every((key) => {
+        if (filters[key as keyof typeof filters]) {
+          return student[key] === true;
+        }
+        return true;
+      });
+    });
+    setFilteredStudents(filtered);
+  }, [filters, students]);
 
   const fetchFollowUps = async (studentId: string) => {
     try {
       const response = await axios.get(`http://localhost:3000/api/student/${studentId}/follow-ups`);
       setFollowUps(response.data);
-      console.log(response.data)
     } catch (error) {
       console.error('Error fetching follow-ups:', error);
     }
   };
 
+  const handleDownload = async (fileName: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/student/${selectedStudent._id}/download/${fileName}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
+  const handleAddFollowUp = async () => {
+    if (!selectedStudent) return;
+    const followUp = {
+      ...followUpData,
+      asistentaSocial: followUpData.asistentaSocial || false,
+      justAsistentaSocial: followUpData.asistentaSocial ? followUpData.justAsistentaSocial : 'none',
+      ajusteAcademico: followUpData.ajusteAcademico || false,
+      justAjusteAcademico: followUpData.ajusteAcademico ? followUpData.justAjusteAcademico : 'none',
+      documentoRespaldo: followUpData.documentoRespaldo || false,
+      justDocumentoRespaldo: followUpData.documentoRespaldo ? followUpData.justDocumentoRespaldo : 'none',
+      noAceptaIndicaciones: followUpData.noAceptaIndicaciones || false,
+      justNoAceptaIndicaciones: followUpData.noAceptaIndicaciones ? followUpData.justNoAceptaIndicaciones : 'none',
+      otro: followUpData.otro || 'none',
+    };
+    try {
+      await axios.post(`http://localhost:3000/api/student/add-follow-up`, {
+        id: selectedStudent._id,
+        follow_up: followUp,
+      });
+      setOpenModalFollowUp(false);
+      setFollowUpData({
+        date: '',
+        notes: '',
+        asistentaSocial: false,
+        justAsistentaSocial: 'none',
+        ajusteAcademico: false,
+        justAjusteAcademico: 'none',
+        documentoRespaldo: false,
+        justDocumentoRespaldo: 'none',
+        noAceptaIndicaciones: false,
+        justNoAceptaIndicaciones: 'none',
+        otro: 'none',
+      });
+      fetchFollowUps(selectedStudent._id);
+    } catch (error) {
+      console.error('Error adding follow-up:', error);
+    }
+  }
+  const handleFileUpload = async (studentId: string) => {
+    if (files.length === 0) return;
+
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    try {
+      await axios.post(`http://localhost:3000/api/student/${studentId}/upload`, formData);
+      fetchFileNames(studentId);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+    }
+  }
+
+  const handleSubmit = () => {
+    setOpenModalFollowUp(true);
+  }
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: string) => {
     setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
@@ -64,6 +191,8 @@ export default function Students() {
 
   const handleMenuClose = (studentId: string) => {
     setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
+    setAnchorEl(null);
+
   };
 
   const handleModalOpen = async (student: any) => {
@@ -113,7 +242,24 @@ export default function Students() {
         console.error('Error updating student:', error);
       });
   };
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, student: any) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedStudent(student);
+  };
+  const handleStateChange = async (newState: boolean) => {
+    if (!selectedStudent) return;
 
+    try {
+      await axios.patch(`http://localhost:3000/api/student/${selectedStudent._id}`, {
+        state: newState
+      });
+      
+      setReload(!reload); // Trigger useEffect to refetch data
+      handleMenuClose(""); // Close the menu after processing
+    } catch (error) {
+      console.error("Error updating student status:", error);
+    }
+  };
   // Define columns for DataGrid
   const columns: GridColDef[] = [
     { field: 'fatherLastName', headerName: 'Apellido Paterno', width: 150 },
@@ -132,6 +278,23 @@ export default function Students() {
             <Button variant="contained" color="primary" onClick={() => handleModalOpen(params.row)}>
               Ver Alumno
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={(event) => handleMenuOpen(event, params.row)}
+            >
+              Procesar
+            </Button>
+
+            {/* Menu for state change */}
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => handleStateChange(true)}>Procesado</MenuItem>
+              <MenuItem onClick={() => handleStateChange(false)}>Pendiente</MenuItem>
+            </Menu>
           </Box>
         );
       },
@@ -146,10 +309,146 @@ export default function Students() {
         <Button variant="outlined" color="primary">Exportar todos los estudiantes</Button>
         <Button variant="outlined" color="secondary" sx={{ ml: 2 }}>Exportar por rango de fecha</Button>
       </Box>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.consumoSustancias}
+              onChange={handleFilterChange}
+              name="consumoSustancias"
+            />
+          }
+          label="Consumo Problemático de Sustancias"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.convivencia}
+              onChange={handleFilterChange}
+              name="convivencia"
+            />
+          }
+          label="Convivencia y Buen Trato"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.emocional}
+              onChange={handleFilterChange}
+              name="emocional"
+            />
+          }
+          label="Emocional"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.academico}
+              onChange={handleFilterChange}
+              name="academico"
+            />
+          }
+          label="Académico"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.uvinclusiva}
+              onChange={handleFilterChange}
+              name="uvinclusiva"
+            />
+          }
+          label="UV Inclusiva (Neurodivergencia)"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.abuso}
+              onChange={handleFilterChange}
+              name="abuso"
+            />
+          }
+          label="Violencia Física-Psicológica, Abuso"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.economicos}
+              onChange={handleFilterChange}
+              name="economicos"
+            />
+          }
+          label="Económicos"
+        />
+      </Grid>
+
+      {/* Additional Fields */}
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.emocionalYAcademico}
+              onChange={handleFilterChange}
+              name="emocionalYAcademico"
+            />
+          }
+          label="Emocional y Académico"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.economicoEmocionalAcademico}
+              onChange={handleFilterChange}
+              name="economicoEmocionalAcademico"
+            />
+          }
+          label="Económico, Emocional y Académico"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.economicoEmocional}
+              onChange={handleFilterChange}
+              name="economicoEmocional"
+            />
+          }
+          label="Económico y Emocional"
+        />
+      </Grid>
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.economicoAcademico}
+              onChange={handleFilterChange}
+              name="economicoAcademico"
+            />
+          }
+          label="Económico y Académico"
+        />
+      </Grid>
+
+
       <Box sx={{ flexGrow: 1 }}>
         <Paper elevation={3}>
           <DataGrid
-            rows={students}
+            rows={filteredStudents}
             columns={columns}
             getRowId={(row) => row._id}  // Use _id as the unique row identifier
             sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
@@ -472,7 +771,7 @@ export default function Students() {
                         <>
                           <li key={index}>{fileName}</li>
                           <Button variant="contained" color="primary" onClick={() => handleDownload(fileName)}> Descargar </Button>
-                          </>
+                        </>
                       ))}
                     </ul>
                   ) : (
@@ -508,11 +807,52 @@ export default function Students() {
                   <Typography variant="h6">Seguimientos Realizados</Typography>
                   {followUps.length > 0 ? (
                     followUps.map((followUp, index) => (
-                      <Box key={followUp._id} sx={{ mt: 2, p: 2, border: '1px solid #ccc' }}>
+                      <Box key={followUp?._id || index} sx={{ mt: 2, p: 2, border: '1px solid #ccc' }}>
                         <Typography variant="body1">
-                          <strong>#{index + 1}</strong> Fecha: {new Date(followUp.date).toLocaleDateString()}
+                          <strong>#{index + 1}</strong> Fecha: {followUp?.date ? new Date(followUp.date).toLocaleDateString() : 'Fecha no disponible'}
                         </Typography>
-                        <Typography variant="body1">Notas: {followUp.notes}</Typography>
+                        <Typography variant="body1">Notas: {followUp?.notes || 'Notas no disponibles'}</Typography>
+
+                        {/* Displaying the follow-up fields */}
+                        <Typography variant="body1">
+                          Asistenta Social: {followUp?.asistentaSocial ? 'Sí' : 'No'}
+                        </Typography>
+                        {followUp?.asistentaSocial && (
+                          <Typography variant="body2">
+                            Justificación: {followUp?.justAsistentaSocial || 'No especificado'}
+                          </Typography>
+                        )}
+
+                        <Typography variant="body1">
+                          Ajuste Académico: {followUp?.ajusteAcademico ? 'Sí' : 'No'}
+                        </Typography>
+                        {followUp?.ajusteAcademico && (
+                          <Typography variant="body2">
+                            Justificación: {followUp?.justAjusteAcademico || 'No especificado'}
+                          </Typography>
+                        )}
+
+                        <Typography variant="body1">
+                          Documento de Respaldo: {followUp?.documentoRespaldo ? 'Sí' : 'No'}
+                        </Typography>
+                        {followUp?.documentoRespaldo && (
+                          <Typography variant="body2">
+                            Justificación: {followUp?.justDocumentoRespaldo || 'No especificado'}
+                          </Typography>
+                        )}
+
+                        <Typography variant="body1">
+                          No Acepta Indicaciones: {followUp?.noAceptaIndicaciones ? 'Sí' : 'No'}
+                        </Typography>
+                        {followUp?.noAceptaIndicaciones && (
+                          <Typography variant="body2">
+                            Justificación: {followUp?.justNoAceptaIndicaciones || 'No especificado'}
+                          </Typography>
+                        )}
+
+                        <Typography variant="body1">
+                          Otro: {followUp?.otro || 'No especificado'}
+                        </Typography>
                       </Box>
                     ))
                   ) : (
@@ -520,6 +860,7 @@ export default function Students() {
                   )}
                 </Box>
               </Paper>
+
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                 <Button onClick={handleUpdate} variant="contained" color="primary" sx={{ mr: 2 }}>
