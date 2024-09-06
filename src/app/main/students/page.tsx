@@ -3,14 +3,22 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-
+import FollowUpModal from "../components/followUpModals";
 export default function Students() {
   const [students, setStudents] = useState<any[]>([]);
   const [followUps, setFollowUps] = useState<any[]>([]); // State to store follow-ups
   const [fileNames, setFileNames] = useState([]); // State to store file names
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalFollowUp, setOpenModalFollowUp] = useState(false);
+  const [studentId, setStudentId] = useState('');
   const [menuAnchorEls, setMenuAnchorEls] = useState<Record<string, HTMLElement | null>>({});
+  const [files, setFiles] = useState<File[]>([]);
+  const [followUpData, setFollowUpData] = useState({
+    date: '',
+    notes: ''
+  });
+
 
   useEffect(() => {
     if (selectedStudent) {
@@ -18,7 +26,6 @@ export default function Students() {
         try {
           const response = await axios.get(`http://localhost:3000/api/student/${selectedStudent._id}/follow-ups`);
           setFollowUps(response.data);
-          console.log(response.data)
         } catch (error) {
           console.error('Error fetching follow-ups:', error);
         }
@@ -40,18 +47,40 @@ export default function Students() {
       });
   }, []);
 
+  const fetchFollowUps = async (studentId: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/student/${studentId}/follow-ups`);
+      setFollowUps(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error fetching follow-ups:', error);
+    }
+  };
+
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: string) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
+  };
+
+  const handleMenuClose = (studentId: string) => {
+    setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
+  };
+
   const handleModalOpen = async (student: any) => {
     setSelectedStudent(student);
     setOpenModal(true);
+    fetchFileNames(student._id);
+  };
 
+  const fetchFileNames = async (studentId: string) => {
     try {
-      // Fetch file names for the selected student
-      const response = await axios.get(`http://localhost:3000/api/student/${student._id}/filenames`);
+      const response = await axios.get(`http://localhost:3000/api/student/${studentId}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
     }
   };
+
 
   const handleModalClose = () => {
     setOpenModal(false);
@@ -122,18 +151,8 @@ export default function Students() {
           <DataGrid
             rows={students}
             columns={columns}
-            getRowId={(row) => row._id}
-            sx={{
-              height: '100%',
-              width: '100%',
-              backgroundColor: '#f5f5f5', // Light grey background
-              '& .MuiDataGrid-columnHeaderTitle': {
-                color: '#000', // Black text color for headers
-              },
-              '& .MuiDataGrid-cell': {
-                color: '#000', // Black text color for cells
-              },
-            }}
+            getRowId={(row) => row._id}  // Use _id as the unique row identifier
+            sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
           />
         </Paper>
       </Box>
@@ -154,6 +173,17 @@ export default function Students() {
           <Typography variant="h4" component="h2" gutterBottom>
             Información del Alumno
           </Typography>
+
+          <Button variant="contained" color="primary" onClick={() => handleSubmit()}>
+            Añadir Seguimiento a este alumno
+          </Button>
+          <FollowUpModal
+            open={openModalFollowUp}
+            onClose={() => setOpenModalFollowUp(false)}
+            followUpData={followUpData}
+            setFollowUpData={setFollowUpData}
+            handleAddFollowUp={handleAddFollowUp}
+          />
           {selectedStudent && (
             <>
               <TextField
@@ -439,12 +469,37 @@ export default function Students() {
                   {fileNames.length > 0 ? (
                     <ul>
                       {fileNames.map((fileName, index) => (
-                        <li key={index}>{fileName}</li>
+                        <>
+                          <li key={index}>{fileName}</li>
+                          <Button variant="contained" color="primary" onClick={() => handleDownload(fileName)}> Descargar </Button>
+                          </>
                       ))}
                     </ul>
                   ) : (
                     <Typography variant="body2">No hay archivos subidos para este estudiante</Typography>
                   )}
+                </Box>
+                <Box>
+                  <Typography variant="h6">Subir Archivos</Typography>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files) {
+                        setFiles(Array.from(files));
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleFileUpload(selectedStudent._id)}
+                    sx={{ mt: 2 }}
+                  >
+                    Subir Archivos
+                  </Button>
+
                 </Box>
               </Paper>
 
