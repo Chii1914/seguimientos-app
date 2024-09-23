@@ -1,5 +1,7 @@
 'use client';
 import React, { useState, useEffect } from "react";
+import { SelectChangeEvent } from '@mui/material';
+
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
@@ -29,11 +31,18 @@ export default function Students() {
     economicoEmocionalAcademico: false,
     economicoEmocional: false,
     economicoAcademico: false,
+    state: 'all'
   });
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    setFilters((prevFilters) => ({ ...prevFilters, [name]: checked }));
+  const handleFilterChange = (
+    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
+  ) => {
+    const { name, value } = event.target as HTMLInputElement | { name: string; value: string };
+    const checked = (event.target as HTMLInputElement).checked;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: (event.target as HTMLInputElement).type === 'checkbox' ? checked : value,
+    }));
   };
   useEffect(() => {
     const filtered = students.filter((student) => {
@@ -91,13 +100,19 @@ export default function Students() {
 
   useEffect(() => {
     const filtered = students.filter((student) => {
-      // Apply the boolean filters
-      return Object.keys(filters).every((key) => {
+      const matchesFilters = Object.keys(filters).every((key) => {
+        if (key === 'state') {
+          if (filters.state === 'pendiente') return student.state === false;
+          if (filters.state === 'procesado') return student.state === true;
+          return true; // 'all'
+        }
         if (filters[key as keyof typeof filters]) {
           return student[key] === true;
         }
         return true;
       });
+
+      return matchesFilters;
     });
     setFilteredStudents(filtered);
   }, [filters, students]);
@@ -113,7 +128,7 @@ export default function Students() {
 
   const handleDownload = async (fileName: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/student/${selectedStudent._id}/download/${fileName}`, {
+      const response = await axios.get(`http://localhost:3000/api/student/download/${selectedStudent._id}/${fileName}`, {
         responseType: 'blob'
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -174,7 +189,7 @@ export default function Students() {
     });
 
     try {
-      await axios.post(`http://localhost:3000/api/student/${studentId}/upload`, formData);
+      await axios.post(`http://localhost:3000/api/student/files/${studentId}`, formData);
       fetchFileNames(studentId);
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -253,9 +268,10 @@ export default function Students() {
       await axios.patch(`http://localhost:3000/api/student/${selectedStudent._id}`, {
         state: newState
       });
-      
-      setReload(!reload); // Trigger useEffect to refetch data
-      handleMenuClose(""); // Close the menu after processing
+
+      setReload(!reload);
+      alert(`Estado administrativo de ${selectedStudent.fatherLastName} actualizado correctamente`);
+      handleMenuClose("");
     } catch (error) {
       console.error("Error updating student status:", error);
     }
@@ -393,8 +409,6 @@ export default function Students() {
           label="Económicos"
         />
       </Grid>
-
-      {/* Additional Fields */}
       <Grid item>
         <FormControlLabel
           control={
@@ -443,7 +457,24 @@ export default function Students() {
           label="Económico y Académico"
         />
       </Grid>
-
+      <Grid item>
+        <FormControlLabel
+          control={
+            <Select
+              name="state"
+              value={filters.state}
+              onChange={handleFilterChange}
+              displayEmpty
+            >
+              <MenuItem value="all">Todos</MenuItem>
+              <MenuItem value="pendiente">Pendiente</MenuItem>
+              <MenuItem value="procesado">Procesado</MenuItem>
+            </Select>
+          }
+          label="Estado"
+          labelPlacement="start"
+        />
+      </Grid>
 
       <Box sx={{ flexGrow: 1 }}>
         <Paper elevation={3}>
