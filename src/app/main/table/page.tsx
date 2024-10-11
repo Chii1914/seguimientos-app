@@ -99,7 +99,7 @@ export default function Table() {
           justEconomicoAcademico: studentData.economicoAcademico ? studentData.justEconomicoAcademico : 'none'
         };
 
-        const response = await axios.post('http://localhost:3000/api/student', adjustedStudentData);
+        const response = await axios.post('http://segapi.administracionpublica-uv.cl/api/student', adjustedStudentData);
         const studentId = response.data._id;
         if (files.length > 0) {
           await handleFileUpload(studentId);
@@ -156,7 +156,7 @@ export default function Table() {
 
   const handleAddFollowUp = async () => {
     try {
-      const followUpResponse = await axios.post('http://localhost:3000/api/student/add-follow-up', {
+      const followUpResponse = await axios.post('http://segapi.administracionpublica-uv.cl/api/student/add-follow-up', {
         id: studentId,
         follow_up: followUpData
       });
@@ -171,7 +171,7 @@ export default function Table() {
     files.forEach(file => formData.append('files', file)); // Append each selected file to the form data
 
     try {
-      const uploadResponse = await axios.post(`http://localhost:3000/api/student/files/${studentId}`, formData, {
+      const uploadResponse = await axios.post(`http://segapi.administracionpublica-uv.cl/api/student/files/${studentId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
