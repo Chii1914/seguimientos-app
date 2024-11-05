@@ -1,12 +1,15 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { SelectChangeEvent } from '@mui/material';
-
+import {useAuth} from "../lib/auth";
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
 export default function Students() {
+
+  useAuth();
+
   const [students, setStudents] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [followUps, setFollowUps] = useState<any[]>([]); // State to store follow-ups
@@ -317,7 +320,7 @@ export default function Students() {
       sortable: false,
       filterable: false
     },
-  ];
+  ]; 
 
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>

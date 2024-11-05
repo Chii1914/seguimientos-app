@@ -3,8 +3,10 @@ import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper, Moda
 import { useState } from 'react';
 import axios from 'axios';
 import FollowUpModal from '../components/followUpModals';
+import { useAuth } from "../lib/auth";
 
 export default function Table() {
+  useAuth();
   const [studentData, setStudentData] = useState({
     consumoSustancias: false,
     justConsumoSustancias: '',

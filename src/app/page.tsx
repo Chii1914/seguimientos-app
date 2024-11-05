@@ -9,7 +9,7 @@ export default function Home() {
 
   const Router = useRouter();
   const login = () => {
-    Router.push('/main');
+    window.location.href = "http://localhost:3000/api/auth/google";
   }
 
   const Item = styled(Paper)(({ theme }) => ({

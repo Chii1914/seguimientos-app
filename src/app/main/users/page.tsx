@@ -11,7 +11,7 @@ export default function Reports() {
               variant="h1"
               className="text-center"
             >
-             Reports
+             usuarios
             </Typography>
     </main>
   );

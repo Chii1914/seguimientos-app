@@ -5,12 +5,13 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
+import { useAuth } from "./lib/auth";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 const Layout = ({ children }: { children: ReactNode }) => {
-
   const router = useRouter();
+  useAuth();
 
   const handleDrawerButtonClick = (text: string) => {
     switch (text) {
@@ -25,6 +26,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
         break;
       case 'Añadir Alumno':
         router.push('/main/table');
+        break;
+      case 'Gestión de usuarios':
+        router.push('/main/users');
         break;
       default:
         break;
@@ -57,7 +61,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inicio', 'Reportes', 'Alumnos', 'Añadir Alumno'].map((text, index) => (
+        {['Inicio', 'Reportes', 'Alumnos', 'Añadir Alumno', 'Gestión de usuarios'].map((text, index) => (
           <ListItem key={text} disablePadding onClick={() => handleDrawerButtonClick(text)}>
             <ListItemButton>
               <ListItemIcon>
