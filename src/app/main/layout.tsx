@@ -24,11 +24,14 @@ const Layout = ({ children }: { children: ReactNode }) => {
       case 'Alumnos':
         router.push('/main/students');
         break;
-      case 'Añadir Alumno':
+      case 'Añadir alumno':
         router.push('/main/table');
         break;
       case 'Gestión de usuarios':
         router.push('/main/users');
+        break;
+      case 'Documentos alumnos':
+        router.push('/main/docs');
         break;
       default:
         break;
@@ -61,7 +64,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inicio', 'Reportes', 'Alumnos', 'Añadir Alumno', 'Gestión de usuarios'].map((text, index) => (
+        {['Inicio', 'Reportes', 'Alumnos', 'Añadir alumno', 'Gestión de usuarios', 'Documentos alumnos'].map((text, index) => (
           <ListItem key={text} disablePadding onClick={() => handleDrawerButtonClick(text)}>
             <ListItemButton>
               <ListItemIcon>
