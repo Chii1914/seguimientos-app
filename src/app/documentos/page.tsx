@@ -1,10 +1,14 @@
 "use client";
+import DescriptionIcon from '@mui/icons-material/Description';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import React, { useState, useEffect } from "react";
 import { SelectChangeEvent } from '@mui/material';
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Verified } from '@mui/icons-material';
 export default function Students() {
 
   const [students, setStudents] = useState<any[]>([]);
@@ -14,91 +18,137 @@ export default function Students() {
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [openModal, setOpenModal] = useState(false);
   const [openModalFollowUp, setOpenModalFollowUp] = useState(false);
-  const [studentId, setStudentId] = useState('');
+  const [studentMail, setStudentMail] = useState('');
   const [menuAnchorEls, setMenuAnchorEls] = useState<Record<string, HTMLElement | null>>({});
   const [files, setFiles] = useState<File[]>([]);
   const [reload, setReload] = useState(false); // State to trigger re-fetch
   const [filteredStudents, setFilteredStudents] = useState<any[]>([]);
   const [filters, setFilters] = useState({
-    consumoSustancias: false,
-    convivencia: false,
-    emocional: false,
-    academico: false,
-    uvinclusiva: false,
-    abuso: false,
-    economicos: false,
-    emocionalYAcademico: false,
-    economicoEmocionalAcademico: false,
-    economicoEmocional: false,
-    economicoAcademico: false,
-    state: 'all'
+    verified: 'all'
   });
 
-  useEffect(() => {
+  /*useEffect(() => {
     // Datos simulados para prueba
     const mockStudents = [
       {
-        _id: "1",
+        mail: "1",
         fatherLastName: "Pérez",
         motherLastName: "Gómez",
         name: "Juan",
         secondName: "Carlos",
         semester: "2",
         rut: "12345678-9",
-        verified: true
+        state: true,
       },
       {
-        _id: "2",
+        mail: "2",
         fatherLastName: "López",
         motherLastName: "Martínez",
         name: "Ana",
         secondName: "María",
         semester: "4",
         rut: "98765432-1",
-        verified: false
+        state: true,
+
       },
     ];
     setStudents(mockStudents);
     setFilteredStudents(mockStudents);
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+    axios.get('http://localhost:6969/api/student')
+      .then(response => {
+        setStudents(response.data);
+        console.log('Estudiantes cargados:', response.data);
+        if (response.data.length > 0){
+          console.log('Tipo de dato de "verified":', typeof response.data[0].verified);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching students:', error);
+      });
+  }, [reload]);
   
-  const fetchFileNames = async (studentId: string) => {
+  
+  const fetchFileNames = async (studentMail: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/student/${studentId}/filenames`);
+      const response = await axios.get(`http://localhost:6969/api/student/${studentMail}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
     }
   };
 
-  const handleFilterChange = (
-      event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
-    ) => {
-      const { name, value } = event.target as HTMLInputElement | { name: string; value: string };
-      const checked = (event.target as HTMLInputElement).checked;
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        [name]: (event.target as HTMLInputElement).type === 'checkbox' ? checked : value,
-      }));
-    };
-    useEffect(() => {
-      const filtered = students.filter((student) => {
-        return Object.keys(filters).every((key) => {
-          if (filters[key as keyof typeof filters]) {
-            return student[key] === true;
-          }
-          return true;
-        });
-      });
-      setFilteredStudents(filtered);
-    }, [filters, students]);
+  // Manejador para cambios en el filtro
+const handleFilterChange = (
+  event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
+) => {
+  const { name, value } = event.target as HTMLInputElement | { name: string; value: string };
+  setFilters((prevFilters) => ({
+    ...prevFilters,
+    [name]: value,
+  }));
+};
+  
+  // Efecto para filtrar estudiantes
+  useEffect(() => {
+    const filtered = students.filter((student) => {
+      if (filters.verified === 'all') {
+        return true; // Mostrar todos
+      }
+      if (filters.verified === 'true') {
+        return student.verified === 1;
+      }
+      if (filters.verified === 'false') {
+        return student.verified === 0;
+      }
+      return true;
+    });
+  
+    setFilteredStudents(filtered);
+    console.log('Estudiantes filtrados:', filtered);
+  }, [filters, students]);
+  
+
+  const [followUpData, setFollowUpData] = useState({
+    date: '',
+    notes: '',
+    asistentaSocial: false,
+    justAsistentaSocial: 'none',
+    ajusteAcademico: false,
+    justAjusteAcademico: 'none',
+    documentoRespaldo: false,
+    justDocumentoRespaldo: 'none',
+    noAceptaIndicaciones: false,
+    justNoAceptaIndicaciones: 'none',
+    otro: 'none',
+  });
+
+
+  /*useEffect(() => {
+    if (selectedStudent) {
+      const fetchFollowUps = async () => {
+        try {
+          const response = await axios.get(`http://localhost:6969/api/student/${selectedStudent.mail}/follow-ups`);
+          setFollowUps(response.data);
+        } catch (error) {
+          console.error('Error fetching follow-ups:', error);
+        }
+      };
+
+      fetchFollowUps();
+    } else {
+      setFollowUps([]); 
+    }
+  }, [selectedStudent]);*/
 
 
   const handleStateChange = async (newState: boolean) => {
     if (!selectedStudent) return;
 
     try {
-      await axios.patch(`http://localhost:3000/api/student/${selectedStudent._id}`, {
+      await axios.patch(`http://localhost:6969/api/student/${selectedStudent.mail}`, {
         state: newState
       });
 
@@ -114,8 +164,8 @@ export default function Students() {
       setOpenModalFollowUp(true);
     }
   
-    const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentId: string) => {
-      setMenuAnchorEls((prev) => ({ ...prev, [studentId]: event.currentTarget }));
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>, studentMail: string) => {
+      setMenuAnchorEls((prev) => ({ ...prev, [studentMail]: event.currentTarget }));
     };
     
     const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, student: any) => {
@@ -123,8 +173,8 @@ export default function Students() {
         setSelectedStudent(student);
       };
 
-    const handleMenuClose = (studentId: string) => {
-      setMenuAnchorEls((prev) => ({ ...prev, [studentId]: null }));
+    const handleMenuClose = (studentMail: string) => {
+      setMenuAnchorEls((prev) => ({ ...prev, [studentMail]: null }));
       setAnchorEl(null);
   
     };
@@ -132,90 +182,112 @@ export default function Students() {
     const handleModalOpen = async (student: any) => {
       setSelectedStudent(student);
       setOpenModal(true);
-      fetchFileNames(student._id);
+      fetchFileNames(student.mail);
     };
- 
-  const columns: GridColDef[] = [
-    { field: 'fatherLastName', headerName: 'Apellido Paterno', width: 150 },
-    { field: 'motherLastName', headerName: 'Apellido Materno', width: 150 },
-    { field: 'name', headerName: 'Nombre', width: 150 },
-    { field: 'secondName', headerName: 'Segundo Nombre', width: 150 },
-    { field: 'semester', headerName: 'Semestre', width: 100 },
-    { field: 'rut', headerName: 'RUT', width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Acciones',
-      width: 300,
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Box>
-            <Button variant="contained" color="primary" onClick={() => handleModalOpen(params.row)}>
-              Validar
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={(event) => handleMenuOpen(event, params.row)}
-            >
-              Eliminar
-            </Button>
-            <Button variant="contained" color="primary" onClick={() => handleModalOpen(params.row)}>
-              Pedir otro documento
-            </Button>
 
-            {/* Menu for state change */}
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={() => handleStateChange(true)}>Procesado</MenuItem>
-              <MenuItem onClick={() => handleStateChange(false)}>Pendiente</MenuItem>
-            </Menu>
-          </Box>
-        );
+    const handleFileUpload = async (studentMail: string) => {
+      if (files.length === 0) return;
+  
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+  
+      try {
+        await axios.post(`http://localhost:6969/api/student/files/${studentMail}`, formData);
+        fetchFileNames(studentMail);
+      } catch (error) {
+        console.error('Error uploading files:', error);
+      }
+    }
+ 
+    const columns: GridColDef[] = [
+      { field: 'fatherLastName', headerName: 'Apellido Paterno', width: 150 },
+      { field: 'motherLastName', headerName: 'Apellido Materno', width: 150 },
+      { field: 'name', headerName: 'Nombre', width: 150 },
+      { field: 'secondName', headerName: 'Segundo Nombre', width: 150 },
+      { field: 'semester', headerName: 'Semestre', width: 100 },
+      { field: 'rut', headerName: 'RUT', width: 150 },
+      {
+        field: 'actions',
+        headerName: 'Acciones',
+        width: 200,
+        renderCell: (params: GridRenderCellParams) => {
+          return (
+            <Box display="flex" gap={1}>
+              {/* Botón para validar */}
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => handleStateChange(true)}
+                size="small"
+                startIcon={<CheckCircleIcon />}
+              >
+                {/* Texto opcional */}
+              </Button>
+    
+              {/* Botón para eliminar */}
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleStateChange(false)}
+                size="small"
+                startIcon={<CancelIcon />}
+              >
+                {/* Texto opcional */}
+              </Button>
+    
+              {/* Botón para pedir otro documento */}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleFileUpload(params.row)}
+                size="small"
+                startIcon={<DescriptionIcon />} // Ícono representativo para documentos
+              >
+                {/* Texto opcional */}
+              </Button>
+            </Box>
+          );
+        },
+        sortable: false,
+        filterable: false,
       },
-      sortable: false,
-      filterable: false
-    },
-  ]; 
+    ];
+    
   
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <Typography
-              variant="h1"
-              className="text-center"
-            >
-             Reports
-            </Typography>
+
             
                   
             <Grid item>
                 <FormControlLabel
                     control={
                     <Select
-                        name="state"
-                        value={filters.state}
+                        name="verified"
+                        value={filters.verified}
                         onChange={handleFilterChange}
                         displayEmpty
                     >
-                        <MenuItem value="all">Todos</MenuItem>
-                        <MenuItem value="pendiente">Pendiente</MenuItem>
-                        <MenuItem value="procesado">Procesado</MenuItem>
+                        <MenuItem value='all'>Todos</MenuItem>
+                        <MenuItem value='true'>Verificado</MenuItem>
+                        <MenuItem value='false'>No verificado</MenuItem>
+
                     </Select>
                     }
                     label="Estado"
                     labelPlacement="start"
                 />
-                </Grid>
+            </Grid>
 
             <Box sx={{ flexGrow: 1 }}>
                 <Paper elevation={3}>
                 <DataGrid
                     rows={filteredStudents}
                     columns={columns}
-                    getRowId={(row) => row._id}  // Use _id as the unique row identifier
+                    getRowId={(row) => row.mail}  // Use mail as the unique row identifier
                     sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
                     />
                 </Paper>
