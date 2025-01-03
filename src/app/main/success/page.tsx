@@ -1,21 +1,30 @@
 "use client";
+
 import { useEffect } from "react";
-import { useRouter } from "next/navigation"; // Use this instead of "next/router"
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 export default function Success() {
   const router = useRouter();
 
   useEffect(() => {
-    // Access the URL search params to get `xvlf` from the query
     const params = new URLSearchParams(window.location.search);
     const xvlf = params.get("xvlf");
 
+    // Remove the old cookie
+    Cookies.remove("xvlf");
+
     if (xvlf) {
-      // Save the session token in a cookie
+      // Set the new cookie
       Cookies.set("xvlf", xvlf, { expires: 7, path: "/" });
-      // Redirect to the main page or a protected page after login
-      router.push("/main");
+
+      const newToken = Cookies.get("xvlf");
+
+      if (newToken === xvlf) {
+        router.push("/main");
+      } else {
+        console.error("Failed to set the new token correctly.");
+      }
     }
   }, [router]);
 
