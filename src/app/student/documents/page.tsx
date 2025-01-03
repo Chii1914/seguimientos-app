@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { useAuth } from "@/app/main/lib/auth";
+import Cookies from "js-cookie";
 import {
   Box,
   Button,
@@ -10,8 +12,9 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 
 interface PhotoState {
   photo: string | null;
@@ -25,6 +28,9 @@ export default function Reports() {
     { photo: null },
     { photo: null },
   ]);
+
+  // State to hold the consent checkbox value
+  const [consent, setConsent] = useState(false);
 
   const handlePhotoUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -42,6 +48,49 @@ export default function Reports() {
   };
 
   const labels = ["Foto carnet anverso", "Foto carnet reverso"];
+
+  const handleSubmit = async () => {
+    // Check if both photos are uploaded
+    if (photos.some((photoState) => photoState.photo === null)) {
+      alert("Please upload both photos.");
+      return;
+    }
+
+    // Check if consent is given
+    if (!consent) {
+      alert("Please provide your consent.");
+      return;
+    }
+
+    // Prepare the FormData
+    const formData = new FormData();
+    const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+
+    fileInputs.forEach((input, index) => {
+      if (input.files && input.files[0]) {
+        const fieldName = index === 0 ? 'anverso' : 'reverso';
+        formData.append(fieldName, input.files[0]);
+      }
+    });
+
+    // Send the request to the backend using axios
+    try {
+      const response = await axios.post(`http://localhost:3000/api/student/identificacion`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `${Cookies.get("xvlf")}`,
+        },
+      });
+
+      if (response.status === 201) {
+        alert("Fotos subidas correctamente");
+      } else {
+        alert(`Error: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("Error uploading photos:", error);
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -65,7 +114,7 @@ export default function Reports() {
               ) : (
                 <CardContent>
                   <Typography variant="body1" color="textSecondary">
-                    No se a subido ninguna foto
+                    No se ha subido ninguna foto
                   </Typography>
                 </CardContent>
               )}
@@ -91,10 +140,22 @@ export default function Reports() {
         ))}
       </Grid>
       <Box mt={4}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Acepto que mis datos sean almacenados para las futuras entrevistas de acuerdo a lo conversado"
+        />
+      </Box>
+      <Box mt={4}>
         <Button
           variant="contained"
           color="secondary"
-          onClick={() => console.log("Photos:", photos)}
+          onClick={handleSubmit}
           disabled={photos.some((photoState) => photoState.photo === null)}
         >
           Submit Photos
