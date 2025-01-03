@@ -6,7 +6,6 @@ import FollowUpModal from '../components/followUpModals';
 import { useAuth } from "../lib/auth";
 
 export default function Table() {
-  useAuth();
   const [studentData, setStudentData] = useState({
     consumoSustancias: false,
     justConsumoSustancias: '',

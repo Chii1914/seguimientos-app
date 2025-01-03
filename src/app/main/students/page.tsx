@@ -8,7 +8,6 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
 export default function Students() {
 
-  useAuth();
 
   const [students, setStudents] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

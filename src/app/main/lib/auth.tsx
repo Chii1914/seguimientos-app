@@ -2,16 +2,44 @@
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import axios from "axios";
 
 export function useAuth() {
   const Router = useRouter();
-  const token = Cookies.get("xvlf");
+
+  async function verifyToken() {
+
+    try {
+      const response = await axios.get("http://localhost:3000/api/auth/verify", {
+        headers: {
+          'Authorization': `${Cookies.get("xvlf")}`
+        }
+      });
+      if (response.status === 200) {
+        console.log("continue");
+        return true;
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        Router.push("/");
+      } else {
+        console.error(error);
+      }
+    }
+    return false;
+  }
+
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !token) {
-      Router.push("/");
+    async function checkToken() {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      let auth = await verifyToken();
+      if (typeof window !== "undefined" && !Cookies.get("xvlf") && auth) {
+        Router.push("/");
+      }
     }
-  }, [token, Router]);
+    checkToken();
+  }, [Cookies.get("xvlf"), Router]);
 
-  return token; // Optional: Return the token if needed
+  return Cookies.get("xvlf");
 }
