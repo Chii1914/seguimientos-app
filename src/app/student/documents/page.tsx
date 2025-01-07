@@ -58,7 +58,7 @@ export default function Reports() {
 
     // Check if consent is given
     if (!consent) {
-      alert("Please provide your consent.");
+      alert("Debes aceptar el consentimiento para subir el consentimiento para las fotografías");
       return;
     }
 
@@ -125,7 +125,7 @@ export default function Reports() {
                   fullWidth
                   color="primary"
                 >
-                  {photoState.photo ? "Change Photo" : "Upload Photo"}
+                  {photoState.photo ? "Cambiar foto" : "Subir foto"}
                   <input
                     type="file"
                     accept="image/*"
@@ -158,7 +158,7 @@ export default function Reports() {
           onClick={handleSubmit}
           disabled={photos.some((photoState) => photoState.photo === null)}
         >
-          Submit Photos
+          Subir fotografías
         </Button>
       </Box>
     </main>
