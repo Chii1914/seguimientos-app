@@ -57,7 +57,7 @@ export default function Students() {
   }, []);*/
 
   useEffect(() => {
-    axios.get('http://localhost:6969/api/student')
+    axios.get('http://localhost:3000/api/student')
       .then(response => {
         setStudents(response.data);
         console.log('Estudiantes cargados:', response.data);
@@ -73,7 +73,7 @@ export default function Students() {
   
   const fetchFileNames = async (studentMail: string) => {
     try {
-      const response = await axios.get(`http://localhost:6969/api/student/${studentMail}/filenames`);
+      const response = await axios.get(`http://localhost:3000/api/student/${studentMail}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
@@ -148,7 +148,7 @@ const handleFilterChange = (
     if (!selectedStudent) return;
 
     try {
-      await axios.patch(`http://localhost:6969/api/student/${selectedStudent.mail}`, {
+      await axios.patch(`http://localhost:3000/api/student/${selectedStudent.mail}`, {
         state: newState
       });
 
@@ -194,7 +194,7 @@ const handleFilterChange = (
       });
   
       try {
-        await axios.post(`http://localhost:6969/api/student/files/${studentMail}`, formData);
+        await axios.post(`http://localhost:3000/api/student/files/${studentMail}`, formData);
         fetchFileNames(studentMail);
       } catch (error) {
         console.error('Error uploading files:', error);
