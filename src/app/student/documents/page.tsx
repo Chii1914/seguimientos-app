@@ -15,6 +15,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import FileUploadButton from "@/app/main/lib/filesButton";
 
 interface PhotoState {
   photo: string | null;
@@ -160,6 +161,12 @@ export default function Reports() {
         >
           Subir fotografías
         </Button>
+      </Box>
+      <Box mt={4} className="text-center">
+       <Typography variant="h4" className="text-center" gutterBottom>
+          Documentos solicitados por el entrevistador
+        </Typography>
+        <FileUploadButton email={''}/>
       </Box>
     </main>
   );

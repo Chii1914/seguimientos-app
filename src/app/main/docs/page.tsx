@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 import React, { useState, useEffect } from "react";
 import { SelectChangeEvent } from '@mui/material';
 import axios from 'axios';
-import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid, Card, CardActions, CardContent } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Table, Checkbox, FormControlLabel, Grid, Card, CardActions, CardContent } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Verified } from '@mui/icons-material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -17,6 +17,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Cookies from "js-cookie";
+import { headers } from 'next/headers';
+
+interface FileData {
+  documentFiles: string[];
+  carnetFiles: string[];
+}
+
 export default function Students() {
 
   const [students, setStudents] = useState<any[]>([]);
@@ -59,6 +66,9 @@ export default function Students() {
     whiteSpace: 'nowrap',
     width: 1,
   });
+  const [fileData, setFileData] = useState<FileData>({ documentFiles: [], carnetFiles: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   /*useEffect(() => {
     // Datos simulados para prueba
     const mockStudents = [
@@ -118,7 +128,7 @@ export default function Students() {
       });
     } catch (err) {
       alert("Failed to fetch files. Please try again.");
-    } 
+    }
   };
 
   // Manejador para cambios en el filtro
@@ -221,6 +231,10 @@ export default function Students() {
     }
 
 
+  }
+
+  const handleDownload = async (filename: string) => {
+    console.log(filename);
   }
 
   const handleSubmit = () => {
@@ -389,7 +403,11 @@ export default function Students() {
               <Typography variant="h5" component="div">
                 Subir documento
               </Typography>
-              <FileUploadButton email={"alo"} />
+              {selectedStudent?.mail ? (
+                <FileUploadButton email={selectedStudent.mail} />
+              ) : (
+                <Typography color="error">Selecciona un estudiante para subir documentos.</Typography>
+              )}
             </CardContent>
             <CardActions>
               <Button size="small" onClick={() => handleDocumentRequest()}>Enviar</Button>
@@ -397,10 +415,48 @@ export default function Students() {
           </Card>
           <Card sx={{ minWidth: 275 }}>
             <CardContent>
-              <Typography variant="h5" component="div">
+              <Typography variant="h5" component="div" gutterBottom>
                 Archivos del alumno
               </Typography>
 
+              {loading ? (
+                <Typography variant="body2">Cargando archivos...</Typography>
+              ) : error ? (
+                <Typography variant="body2" color="error">
+                  {error}
+                </Typography>
+              ) : (
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><strong>Tipo</strong></TableCell>
+                        <TableCell><strong>Archivo</strong></TableCell>
+                        <TableCell><strong>Acciones</strong></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {Object.entries(fileData).map(([category, files]) =>
+                        files.map((filename: string) => (
+                          <TableRow key={filename}>
+                            <TableCell>{category === "documentFiles" ? "Documento" : "Carnet"}</TableCell>
+                            <TableCell>{filename}</TableCell>
+                            <TableCell>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                onClick={() => handleDownload(filename)}
+                              >
+                                Descargar
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </CardContent>
           </Card>
         </Box>
