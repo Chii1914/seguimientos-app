@@ -10,8 +10,10 @@ interface FileWithPreview {
     file: File;
     id: string;
 }
-
-const FileUploadButton: React.FC = () => {
+interface FileUploadButtonProps {
+    email: string; // Email passed from the parent component
+}
+const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
     const [files, setFiles] = useState<FileWithPreview[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -30,7 +32,7 @@ const FileUploadButton: React.FC = () => {
         setFiles((prevFiles) => prevFiles.filter((file) => file.id !== id));
     };
 
-    const uploadFiles = async () => {
+    const uploadFiles = async (email: string) => {
         if (files.length === 0) {
             alert("No files to upload!");
             return;
@@ -40,6 +42,7 @@ const FileUploadButton: React.FC = () => {
         files.forEach(({ file }) => {
             formData.append("documents", file);
         });
+        formData.append("email", email);
 
         setUploading(true);
         setUploadSuccess(null);
@@ -108,7 +111,7 @@ const FileUploadButton: React.FC = () => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={uploadFiles}
+                onClick={() => uploadFiles(email)}
                 disabled={uploading || files.length === 0}
                 style={{ marginTop: "1rem" }}
             >
