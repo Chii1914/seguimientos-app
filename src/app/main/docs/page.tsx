@@ -389,7 +389,7 @@ export default function Students() {
               <Typography variant="h5" component="div">
                 Subir documento
               </Typography>
-              <FileUploadButton />
+              <FileUploadButton email={"alo"} />
             </CardContent>
             <CardActions>
               <Button size="small" onClick={() => handleDocumentRequest()}>Enviar</Button>
