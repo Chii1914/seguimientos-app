@@ -91,7 +91,7 @@ export default function Students() {
   }, [selectedStudent]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/student')
+    axios.get('http://localhost:323/api/student')
       .then(response => {
         setStudents(response.data);
       })
