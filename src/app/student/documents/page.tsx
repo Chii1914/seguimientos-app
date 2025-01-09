@@ -15,6 +15,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import FileUploadButton from "@/app/main/lib/filesButton";
 
 interface PhotoState {
   photo: string | null;
@@ -83,10 +84,13 @@ export default function Reports() {
       });
 
       if (response.status === 201) {
+        setPhotos([{ photo: null }, { photo: null }]); // Reset photos
+        setConsent(false); // Reset consent checkbox
         alert("Fotos subidas correctamente");
       } else {
         alert(`Error: ${response.data.message}`);
       }
+
     } catch (error) {
       console.error("Error uploading photos:", error);
     }
@@ -160,6 +164,12 @@ export default function Reports() {
         >
           Subir fotografías
         </Button>
+      </Box>
+      <Box mt={4} className="text-center">
+        <Typography variant="h4" className="text-center" gutterBottom>
+          Documentos solicitados por el entrevistador
+        </Typography>
+        <FileUploadButton email={''} />
       </Box>
     </main>
   );
