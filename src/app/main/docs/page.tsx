@@ -119,7 +119,7 @@ export default function Students() {
     }
   };
 
-  const fetchFiles = async () => {
+  const fetchFiles = async (studentMail: string) => {
     try {
       await axios.get("http://localhost:3000/api/student/filenames", {
         headers: {
@@ -161,51 +161,16 @@ export default function Students() {
   }, [filters, students]);
 
 
-  const [followUpData, setFollowUpData] = useState({
-    date: '',
-    notes: '',
-    asistentaSocial: false,
-    justAsistentaSocial: 'none',
-    ajusteAcademico: false,
-    justAjusteAcademico: 'none',
-    documentoRespaldo: false,
-    justDocumentoRespaldo: 'none',
-    noAceptaIndicaciones: false,
-    justNoAceptaIndicaciones: 'none',
-    otro: 'none',
-  });
-
-
-  /*useEffect(() => {
-    if (selectedStudent) {
-      const fetchFollowUps = async () => {
-        try {
-          const response = await axios.get(`http://localhost:6969/api/student/${selectedStudent.mail}/follow-ups`);
-          setFollowUps(response.data);
-        } catch (error) {
-          console.error('Error fetching follow-ups:', error);
-        }
-      };
-
-      fetchFollowUps();
-    } else {
-      setFollowUps([]); 
-    }
-  }, [selectedStudent]);*/
-
-
-  const handleStateChange = async (student: Object, state: boolean) => {
-    setSelectedStudent(student);
-
+  const handleStateChange = async (student: { mail: string, fatherLastName: string, name: string }, state: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:3000/api/student/verify`, {
-        mail: selectedStudent.mail,
+      await axios.patch(`http://localhost:3000/api/student/verify`, {
+        mail: student.mail,
         verified: state
       }, {
         headers: { Authorization: `${Cookies.get("xvlf")}` }
       });
       setReload(!reload);
-      alert(`Estado administrativo de ${selectedStudent.fatherLastName} actualizado correctamente`);
+      alert(`Estado administrativo de ${student.name} ${student.fatherLastName} actualizado correctamente`);
       handleMenuClose("");
     } catch (error) {
       console.error("Error updating student status:", error);
@@ -232,10 +197,46 @@ export default function Students() {
 
 
   }
+  const handleDownload = async (filename: string, category: string) => {
+    try {
+      // Construct the endpoint URL
+      const endpoint = `http://localhost:3000/api/student/download/${selectedStudent.mail}/${filename}/${category}`;
+  
+      // Make a GET request to the backend with the correct responseType
+      const response = await axios.get(endpoint, { headers: {Authorization: `${Cookies.get('xvlf')}`},responseType: 'json' });
+  
+      if (response.data && response.data.file && Array.isArray(response.data.file.data)) {
+        // Convert the array of numbers (Buffer) to a Uint8Array
+        const fileBuffer = new Uint8Array(response.data.file.data);
+  
+        // Create a Blob from the Uint8Array (binary data)
+        const fileBlob = new Blob([fileBuffer]);
+  
+        // Create a URL for the Blob
+        const url = window.URL.createObjectURL(fileBlob);
+  
+        // Create an anchor element to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', response.data.filename); // Use the filename from the response
+  
+        // Trigger the download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+  
+        console.log('File downloaded successfully');
+      } else {
+        console.error('Invalid response format:', response.data);
+      }
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+  
 
-  const handleDownload = async (filename: string) => {
-    console.log(filename);
-  }
+
+
 
   const handleSubmit = () => {
     setOpenModalFollowUp(true);
@@ -258,9 +259,21 @@ export default function Students() {
 
   const handleModalOpen = async (student: any) => {
     setSelectedStudent(student);
-    setOpenModal(true);
-    fetchFileNames(student.mail);
+    handleOpen()
+    try {
+      const response = await axios.get(`http://localhost:3000/api/student/filenames/${student.mail}`, {
+        headers: {
+          Authorization: `${Cookies.get('xvlf')}`,
+        }
+      });
+      setFileData(response.data);
+    } catch (error) {
+      console.error('Error fetching file data:', error);
+      setFileData({ documentFiles: [], carnetFiles: [] });
+    }
+    setLoading(false);
   };
+
 
   const handleFileUpload = async (studentMail: string) => {
     if (files.length === 0) return;
@@ -323,9 +336,8 @@ export default function Students() {
               variant="contained"
               color="primary"
               onClick={() => {
-                handleOpen();
-                setSelectedStudent(params.row);
-                handleFileUpload(params.row);
+                handleModalOpen(params.row);
+                handleFileUpload(params.row.mail);
               }}
               size="small"
               startIcon={<DescriptionIcon />} // Ícono representativo para documentos
@@ -383,8 +395,21 @@ export default function Students() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%', // Make width responsive
+            maxHeight: '90vh', // Limit height to 90% of viewport
+            overflowY: 'auto', // Enable vertical scrolling
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >          <Typography id="modal-modal-title" variant="h6" component="h2">
             {selectedStudent ? `Subir documentos o solicitar para el alumno ${selectedStudent.fatherLastName} ${selectedStudent.motherLastName}, ${selectedStudent.name} ${selectedStudent.secondName}` : 'Subir documentos'}
           </Typography>
           <Card sx={{ minWidth: 275 }}>
@@ -418,7 +443,6 @@ export default function Students() {
               <Typography variant="h5" component="div" gutterBottom>
                 Archivos del alumno
               </Typography>
-
               {loading ? (
                 <Typography variant="body2">Cargando archivos...</Typography>
               ) : error ? (
@@ -437,21 +461,29 @@ export default function Students() {
                     </TableHead>
                     <TableBody>
                       {Object.entries(fileData).map(([category, files]) =>
-                        files.map((filename: string) => (
-                          <TableRow key={filename}>
-                            <TableCell>{category === "documentFiles" ? "Documento" : "Carnet"}</TableCell>
-                            <TableCell>{filename}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => handleDownload(filename)}
-                              >
-                                Descargar
-                              </Button>
+                        Array.isArray(files) ? (
+                          files.map((filename: string) => (
+                            <TableRow key={filename}>
+                              <TableCell>{category === "documentos" ? "Documento" : <strong>Carnet</strong>}</TableCell>
+                              <TableCell>{filename}</TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={() => handleDownload(filename, category)}
+                                >
+                                  Descargar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3} style={{ textAlign: 'center' }}>
+                              No se encontraron archivos del alumno.
                             </TableCell>
                           </TableRow>
-                        ))
+                        )
                       )}
                     </TableBody>
                   </Table>

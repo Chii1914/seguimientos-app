@@ -84,10 +84,13 @@ export default function Reports() {
       });
 
       if (response.status === 201) {
+        setPhotos([{ photo: null }, { photo: null }]); // Reset photos
+        setConsent(false); // Reset consent checkbox
         alert("Fotos subidas correctamente");
       } else {
         alert(`Error: ${response.data.message}`);
       }
+
     } catch (error) {
       console.error("Error uploading photos:", error);
     }
@@ -163,10 +166,10 @@ export default function Reports() {
         </Button>
       </Box>
       <Box mt={4} className="text-center">
-       <Typography variant="h4" className="text-center" gutterBottom>
+        <Typography variant="h4" className="text-center" gutterBottom>
           Documentos solicitados por el entrevistador
         </Typography>
-        <FileUploadButton email={''}/>
+        <FileUploadButton email={''} />
       </Box>
     </main>
   );
