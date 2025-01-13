@@ -33,9 +33,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
       case 'Documentos alumnos':
         router.push('/main/docs');
         break;
-      case 'Usuarios':
-        router.push('/main/users');
-        break;
       default:
         break;
     }
@@ -67,7 +64,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inicio', 'Reportes', 'Alumnos', 'Añadir alumno', 'Gestión de usuarios', 'Documentos alumnos', 'Usuarios'].map((text, index) => (
+        {['Inicio', 'Reportes', 'Alumnos', 'Añadir alumno', 'Gestión de usuarios', 'Documentos alumnos'].map((text, index) => (
           <ListItem key={text} disablePadding onClick={() => handleDrawerButtonClick(text)}>
             <ListItemButton>
               <ListItemIcon>

@@ -104,7 +104,7 @@ export default function Students() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/student')
+    axios.get('http://localhost:3000/api/student', {headers: {Authorization: `${Cookies.get('xvlf')}`}})
       .then(response => {
         setStudents(response.data);
 
