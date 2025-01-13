@@ -38,6 +38,8 @@ export default function Students() {
   const [files, setFiles] = useState<File[]>([]);
   const [reload, setReload] = useState(false); // State to trigger re-fetch
   const [filteredStudents, setFilteredStudents] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   const [filters, setFilters] = useState({
     verified: 'all'
   });
@@ -97,6 +99,9 @@ export default function Students() {
     setStudents(mockStudents);
     setFilteredStudents(mockStudents);
   }, []);*/
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:3000/api/student')
@@ -109,6 +114,18 @@ export default function Students() {
       });
   }, [reload]);
 
+  useEffect(() => {
+    const filtered = students.filter((student) => {
+      const fullName = `${student.name} ${student.fatherLastName} ${student.motherLastName}`.toLowerCase();
+      return (
+        (filters.verified === "all" ||
+          (filters.verified === "true" && student.verified === 1) ||
+          (filters.verified === "false" && student.verified === 0)) &&
+        fullName.includes(searchQuery.toLowerCase())
+      );
+    });
+    setFilteredStudents(filtered);
+  }, [filters, students, searchQuery]);
 
   const fetchFileNames = async (studentMail: string) => {
     try {
@@ -201,30 +218,30 @@ export default function Students() {
     try {
       // Construct the endpoint URL
       const endpoint = `http://localhost:3000/api/student/download/${selectedStudent.mail}/${filename}/${category}`;
-  
+
       // Make a GET request to the backend with the correct responseType
-      const response = await axios.get(endpoint, { headers: {Authorization: `${Cookies.get('xvlf')}`},responseType: 'json' });
-  
+      const response = await axios.get(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+
       if (response.data && response.data.file && Array.isArray(response.data.file.data)) {
         // Convert the array of numbers (Buffer) to a Uint8Array
         const fileBuffer = new Uint8Array(response.data.file.data);
-  
+
         // Create a Blob from the Uint8Array (binary data)
         const fileBlob = new Blob([fileBuffer]);
-  
+
         // Create a URL for the Blob
         const url = window.URL.createObjectURL(fileBlob);
-  
+
         // Create an anchor element to trigger the download
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', response.data.filename); // Use the filename from the response
-  
+
         // Trigger the download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-  
+
         console.log('File downloaded successfully');
       } else {
         console.error('Invalid response format:', response.data);
@@ -233,7 +250,7 @@ export default function Students() {
       console.error('Error downloading file:', error);
     }
   };
-  
+
 
 
 
@@ -301,11 +318,10 @@ export default function Students() {
     {
       field: 'actions',
       headerName: 'Acciones',
-      width: 200,
+      width: 220,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box display="flex" gap={1}>
-            {/* Botón para validar */}
             <Button
               variant="contained"
               color="success"
@@ -356,27 +372,31 @@ export default function Students() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+        {/* Search Bar */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Buscar por nombre o apellido"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </Grid>
 
-
-
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Select
-              name="verified"
-              value={filters.verified}
-              onChange={handleFilterChange}
-              displayEmpty
-            >
-              <MenuItem value='all'>Todos</MenuItem>
-              <MenuItem value='true'>Verificado</MenuItem>
-              <MenuItem value='false'>No verificado</MenuItem>
-
-            </Select>
-          }
-          label="Estado"
-          labelPlacement="start"
-        />
+        {/* Filter Dropdown */}
+        <Grid item xs={12} sm={6}>
+          <Select
+            name="verified"
+            value={filters.verified}
+            onChange={handleFilterChange}
+            displayEmpty
+          >
+            <MenuItem value="all">Todos</MenuItem>
+            <MenuItem value="true">Verificado</MenuItem>
+            <MenuItem value="false">No verificado</MenuItem>
+          </Select>
+        </Grid>
       </Grid>
 
       <Box sx={{ flexGrow: 1 }}>
@@ -384,8 +404,8 @@ export default function Students() {
           <DataGrid
             rows={filteredStudents}
             columns={columns}
-            getRowId={(row) => row.mail}  // Use mail as the unique row identifier
-            sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
+            getRowId={(row) => row.mail}
+            sx={{ height: "100%", width: "100%" }}
           />
         </Paper>
       </Box>

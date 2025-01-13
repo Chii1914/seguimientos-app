@@ -21,7 +21,6 @@ export default function Success() {
 
       // Verify the new cookie is set
       const newToken = Cookies.get("xvlf");
-      console.log("New token set:", newToken);
 
       if (newToken === xvlf) {
         setTimeout(() => {
