@@ -91,7 +91,7 @@ export default function Students() {
   }, [selectedStudent]);
 
   useEffect(() => {
-    axios.get('http://localhost:323/api/student')
+    axios.get('http://localhost:6969/api/student')
       .then(response => {
         setStudents(response.data);
       })
@@ -481,7 +481,7 @@ export default function Students() {
       <Box sx={{ flexGrow: 1 }}>
         <Paper elevation={3}>
           <DataGrid
-            rows={filteredStudents}
+            rows={students}
             columns={columns}
             getRowId={(row) => row._id}  // Use _id as the unique row identifier
             sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
