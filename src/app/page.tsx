@@ -9,7 +9,7 @@ export default function Home() {
 
   const Router = useRouter();
   const login = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
+    window.location.href = "https://segapi.administracionpublica-uv.cl/api/auth/google";
   }
 
   const Item = styled(Paper)(({ theme }) => ({

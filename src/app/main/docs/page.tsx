@@ -104,7 +104,7 @@ export default function Students() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/student', { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+    axios.get('https://segapi.administracionpublica-uv.cl/api/student', { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       .then(response => {
         setStudents(response.data);
 
@@ -129,7 +129,7 @@ export default function Students() {
 
   const fetchFileNames = async (studentMail: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/student/${studentMail}/filenames`);
+      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/${studentMail}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
@@ -138,7 +138,7 @@ export default function Students() {
 
   const fetchFiles = async (studentMail: string) => {
     try {
-      await axios.get("http://localhost:3000/api/student/filenames", {
+      await axios.get("https://segapi.administracionpublica-uv.cl/api/student/filenames", {
         headers: {
           Authorization: `${Cookies.get('xvlf')}`, // Replace with the actual token
         },
@@ -180,7 +180,7 @@ export default function Students() {
 
   const handleStateChange = async (student: { mail: string, fatherLastName: string, name: string }, state: boolean) => {
     try {
-      await axios.patch(`http://localhost:3000/api/student/verify`, {
+      await axios.patch(`https://segapi.administracionpublica-uv.cl/api/student/verify`, {
         mail: student.mail,
         verified: state
       }, {
@@ -199,7 +199,7 @@ export default function Students() {
     const message = document.getElementById('message') as HTMLInputElement;
     if (!message) { alert("Debe proporcionar un mensaje"); return; }
     try {
-      await axios.post(`http://localhost:3000/api/student/document`, {
+      await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/document`, {
         mail: selectedStudent.mail,
         message: message.value
       }, {
@@ -217,7 +217,7 @@ export default function Students() {
   const handleDownload = async (filename: string, category: string) => {
     try {
       // Construct the endpoint URL
-      const endpoint = `http://localhost:3000/api/student/download/${selectedStudent.mail}/${filename}/${category}`;
+      const endpoint = `https://segapi.administracionpublica-uv.cl/api/student/download/${selectedStudent.mail}/${filename}/${category}`;
 
       // Make a GET request to the backend with the correct responseType
       const response = await axios.get(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
@@ -278,7 +278,7 @@ export default function Students() {
     setSelectedStudent(student);
     handleOpen()
     try {
-      const response = await axios.get(`http://localhost:3000/api/student/filenames/${student.mail}`, {
+      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/filenames/${student.mail}`, {
         headers: {
           Authorization: `${Cookies.get('xvlf')}`,
         }
@@ -301,7 +301,7 @@ export default function Students() {
     });
 
     try {
-      await axios.post(`http://localhost:3000/api/student/files/${studentMail}`, formData);
+      await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/files/${studentMail}`, formData);
       fetchFileNames(studentMail);
     } catch (error) {
       console.error('Error uploading files:', error);

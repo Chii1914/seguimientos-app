@@ -98,7 +98,7 @@ export default function Table() {
 
   const handleSubmit = async (type: string) => {
     try {
-      const newStudent = await axios.post('http://localhost:3000/api/student/initialform', {
+      const newStudent = await axios.post('https://segapi.administracionpublica-uv.cl/api/student/initialform', {
         student: studentData,
         motive: motivesData
       }, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
@@ -167,7 +167,7 @@ export default function Table() {
 
   const handleAddFollowUp = async () => {
     try {
-      const followUpResponse = await axios.post('http://localhost:3000/api/student/add-follow-up', {
+      const followUpResponse = await axios.post('https://segapi.administracionpublica-uv.cl/api/student/add-follow-up', {
 
         follow_up: followUpData
       });

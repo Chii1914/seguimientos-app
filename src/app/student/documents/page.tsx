@@ -76,7 +76,7 @@ export default function Reports() {
 
     // Send the request to the backend using axios
     try {
-      const response = await axios.post(`http://localhost:3000/api/student/identificacion`, formData, {
+      const response = await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/identificacion`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `${Cookies.get("xvlf")}`,
