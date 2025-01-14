@@ -12,6 +12,7 @@ import axios from "axios";
 import CreateIcon from '@mui/icons-material/Create';
 import Cookies from "js-cookie";
 import Swal from 'sweetalert2';
+import ModifyModal from "./components/modifyModal";
 
 export default function Reports() {
   const [reload, setReload] = useState(false);
@@ -31,9 +32,19 @@ export default function Reports() {
     motherLastName: '',
     sede: '',
   });
-  const handleChange = (key: string, value: string | boolean) => {
-    setSelectedUser((prev: any) => ({ ...prev, [key]: value }));
+  const [createUser, setCreateUser] = useState({
+    mail: '',
+    name: '',
+    secondName: '',
+    fatherLastName: '',
+    motherLastName: '',
+    sede: '',
+  });
+
+  const handleNewUserFields = (key: string, value: string | boolean) => {
+    setCreateUser((prev: any) => ({ ...prev, [key]: value }));
   };
+
   const handleChangeNewUser = (key: string, value: string | boolean) => {
     setNewUser((prev: any) => ({ ...prev, [key]: value }));
   };
@@ -131,17 +142,17 @@ export default function Reports() {
 
   const handleNewUser = async () => {
     try {
-      await axios.post(`http://localhost:3000/api/user`, newUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+      await axios.post(`http://localhost:3000/api/user`, createUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       setReload(!reload);
       handleCloseNew();
-      setNewUser({
+      setCreateUser({
         mail: '',
         name: '',
         secondName: '',
         fatherLastName: '',
         motherLastName: '',
         sede: ''
-      }) 
+      })
       Swal.fire({
         toast: true,
         title: 'Usuario añadido',
@@ -206,8 +217,8 @@ export default function Reports() {
 
             <TextField
               label="Correo"
-              value={newUser.mail}
-              onChange={(e) => handleChangeNewUser('mail', e.target.value)}
+              value={createUser.mail}
+              onChange={(e) => handleNewUserFields('mail', e.target.value)}
               fullWidth
               margin="normal"
               sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
@@ -216,8 +227,8 @@ export default function Reports() {
 
             <TextField
               label="Nombre"
-              value={newUser.name}
-              onChange={(e) => handleChangeNewUser('name', e.target.value)}
+              value={createUser.name}
+              onChange={(e) => handleNewUserFields('name', e.target.value)}
               fullWidth
               margin="normal"
               sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
@@ -225,8 +236,8 @@ export default function Reports() {
 
             <TextField
               label="Apellido paterno"
-              value={newUser.fatherLastName}
-              onChange={(e) => handleChangeNewUser('fatherLastName', e.target.value)}
+              value={createUser.fatherLastName}
+              onChange={(e) => handleNewUserFields('fatherLastName', e.target.value)}
               fullWidth
               margin="normal"
               sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
@@ -234,8 +245,8 @@ export default function Reports() {
 
             <TextField
               label="Apellido materno"
-              value={newUser.motherLastName}
-              onChange={(e) => handleChangeNewUser('motherLastName', e.target.value)}
+              value={createUser.motherLastName}
+              onChange={(e) => handleNewUserFields('motherLastName', e.target.value)}
               fullWidth
               margin="normal"
               sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
@@ -245,8 +256,8 @@ export default function Reports() {
             <Select
               label="Sede"
               name="sede"
-              value={newUser.sede}
-              onChange={(e) => handleChangeNewUser('sede', e.target.value)}
+              value={createUser.sede}
+              onChange={(e) => handleNewUserFields('sede', e.target.value)}
               fullWidth
               required
             >
@@ -258,71 +269,14 @@ export default function Reports() {
         </Box>
       </Modal>
 
-      <Modal
+      <ModifyModal
         open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            {selectedUser ? <div> {selectedUser.name} {selectedUser.fatherLastName} {selectedUser.motherLastName} </div> : 'Usuario'}
-          </Typography>
-
-          <TextField
-            label="Correo"
-            value={newUser.mail}
-            onChange={(e) => handleChangeNewUser('mail', e.target.value)}
-            fullWidth
-            margin="normal"
-            sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
-          />
-
-
-          <TextField
-            label="Nombre"
-            value={newUser.name}
-            onChange={(e) => handleChangeNewUser('name', e.target.value)}
-            fullWidth
-            margin="normal"
-            sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
-          />
-
-          <TextField
-            label="Apellido paterno"
-            value={newUser.fatherLastName}
-            onChange={(e) => handleChangeNewUser('fatherLastName', e.target.value)}
-            fullWidth
-            margin="normal"
-            sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
-          />
-
-          <TextField
-            label="Apellido Materno"
-            value={newUser.motherLastName}
-            onChange={(e) => handleChangeNewUser('motherLastName', e.target.value)}
-            fullWidth
-            margin="normal"
-            sx={{ bgcolor: '#f9f9f9' }} // Light grey background for input fields
-          />
-
-          <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Sede</Typography>
-          <Select
-            label="Sede"
-            name="sede"
-            value={newUser.sede}
-            onChange={(e) => handleChangeNewUser('sede', e.target.value)}
-            fullWidth
-            required
-          >
-            {['Valparaíso', 'Santiago', 'San Felipe', 'all'].map((sede) => (
-              <MenuItem key={sede} value={sede}>{sede}</MenuItem>
-            ))}
-          </Select>
-          <Button variant="contained" onClick={() => handleSubmit()}> Guardar cambios </Button>
-        </Box>
-      </Modal>
-
+        handleClose={handleClose}
+        newUser={newUser}
+        selectedUser={selectedUser}
+        handleChangeNewUser={handleChangeNewUser}
+        handleSubmit={handleSubmit}
+      />
     </main>
   );
 }
