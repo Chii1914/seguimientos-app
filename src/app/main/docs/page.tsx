@@ -104,7 +104,7 @@ export default function Students() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/student', {headers: {Authorization: `${Cookies.get('xvlf')}`}})
+    axios.get('http://localhost:3000/api/student', { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       .then(response => {
         setStudents(response.data);
 
@@ -482,8 +482,8 @@ export default function Students() {
                     <TableBody>
                       {Object.entries(fileData).map(([category, files]) =>
                         Array.isArray(files) ? (
-                          files.map((filename: string) => (
-                            <TableRow key={filename}>
+                          files.map((filename: string, index: number) => (
+                            <TableRow key={`${category}-${filename}-${index}`}>
                               <TableCell>{category === "documentos" ? "Documento" : <strong>Carnet</strong>}</TableCell>
                               <TableCell>{filename}</TableCell>
                               <TableCell>
@@ -498,13 +498,14 @@ export default function Students() {
                             </TableRow>
                           ))
                         ) : (
-                          <TableRow>
+                          <TableRow key={category}>
                             <TableCell colSpan={3} style={{ textAlign: 'center' }}>
                               No se encontraron archivos del alumno.
                             </TableCell>
                           </TableRow>
                         )
                       )}
+
                     </TableBody>
                   </Table>
                 </TableContainer>
