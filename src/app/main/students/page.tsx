@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
+import __url from "../lib/const";
 export default function Students() {
 
 
@@ -77,7 +78,7 @@ export default function Students() {
     if (selectedStudent) {
       const fetchFollowUps = async () => {
         try {
-          const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/${selectedStudent._id}/follow-ups`);
+          const response = await axios.get(`${__url}/${selectedStudent._id}/follow-ups`);
           setFollowUps(response.data);
         } catch (error) {
           console.error('Error fetching follow-ups:', error);
@@ -121,7 +122,7 @@ export default function Students() {
 
   const fetchFollowUps = async (studentId: string) => {
     try {
-      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/${studentId}/follow-ups`);
+      const response = await axios.get(`${__url}/student/${studentId}/follow-ups`);
       setFollowUps(response.data);
     } catch (error) {
       console.error('Error fetching follow-ups:', error);
@@ -130,7 +131,7 @@ export default function Students() {
 
   const handleDownload = async (fileName: string) => {
     try {
-      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/download/${selectedStudent._id}/${fileName}`, {
+      const response = await axios.get(`${__url}/student/download/${selectedStudent._id}/${fileName}`, {
         responseType: 'blob'
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -159,7 +160,7 @@ export default function Students() {
       otro: followUpData.otro || 'none',
     };
     try {
-      await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/add-follow-up`, {
+      await axios.post(`${__url}/student/add-follow-up`, {
         id: selectedStudent._id,
         follow_up: followUp,
       });
@@ -191,7 +192,7 @@ export default function Students() {
     });
 
     try {
-      await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/files/${studentId}`, formData);
+      await axios.post(`${__url}/student/files/${studentId}`, formData);
       fetchFileNames(studentId);
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -220,7 +221,7 @@ export default function Students() {
 
   const fetchFileNames = async (studentId: string) => {
     try {
-      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/${studentId}/filenames`);
+      const response = await axios.get(`${__url}/student/${studentId}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
@@ -245,7 +246,7 @@ export default function Students() {
 
     const { _id, follow_ups, __v, ...studentData } = selectedStudent;
 
-    axios.patch(`https://segapi.administracionpublica-uv.cl/api/student/${_id}`, studentData)
+    axios.patch(`${__url}/student/${_id}`, studentData)
       .then(response => {
         setStudents((prevStudents: any[]) =>
           prevStudents.map((student) =>
@@ -267,7 +268,7 @@ export default function Students() {
     if (!selectedStudent) return;
 
     try {
-      await axios.patch(`https://segapi.administracionpublica-uv.cl/api/student/${selectedStudent._id}`, {
+      await axios.patch(`${__url}/student/${selectedStudent._id}`, {
         state: newState
       });
 

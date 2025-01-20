@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Verified } from '@mui/icons-material';
+import __url from '../main/lib/const';
 export default function Students() {
 
   const [students, setStudents] = useState<any[]>([]);
@@ -57,7 +58,7 @@ export default function Students() {
   }, []);*/
 
   useEffect(() => {
-    axios.get('https://segapi.administracionpublica-uv.cl/api/student')
+    axios.get(`${__url}/student`)
       .then(response => {
         setStudents(response.data);
         console.log('Estudiantes cargados:', response.data);
@@ -73,7 +74,7 @@ export default function Students() {
   
   const fetchFileNames = async (studentMail: string) => {
     try {
-      const response = await axios.get(`https://segapi.administracionpublica-uv.cl/api/student/${studentMail}/filenames`);
+      const response = await axios.get(`${__url}/student/${studentMail}/filenames`);
       setFileNames(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
@@ -148,7 +149,7 @@ const handleFilterChange = (
     if (!selectedStudent) return;
 
     try {
-      await axios.patch(`https://segapi.administracionpublica-uv.cl/api/student/${selectedStudent.mail}`, {
+      await axios.patch(`${__url}/student/${selectedStudent.mail}`, {
         state: newState
       });
 
@@ -194,7 +195,7 @@ const handleFilterChange = (
       });
   
       try {
-        await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/files/${studentMail}`, formData);
+        await axios.post(`${__url}/student/files/${studentMail}`, formData);
         fetchFileNames(studentMail);
       } catch (error) {
         console.error('Error uploading files:', error);

@@ -10,7 +10,7 @@ export function useAuth() {
   async function verifyToken() {
 
     try {
-      const response = await axios.get("https://segapi.administracionpublica-uv.cl/api/auth/verify", {
+      const response = await axios.get("http://localhost:3000/api/auth/verify", {
         headers: {
           'Authorization': `${Cookies.get("xvlf")}`
         }
