@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from "./lib/auth";
 
+
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 const Layout = ({ children }: { children: ReactNode }) => {

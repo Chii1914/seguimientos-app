@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Image from "next/image";
-import url from "./main/lib/const";
 import __url from "./main/lib/const";
 
 export default function Home() {

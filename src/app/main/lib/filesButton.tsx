@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Cookies from "js-cookie";
 import axios from 'axios';
+import __url from "./const";
 
 interface FileWithPreview {
     file: File;
@@ -48,7 +49,7 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
         setUploadSuccess(null);
         console.log(files)
         try {
-            await axios.post("https://segapi.administracionpublica-uv.cl/api/student/upload/documents", formData, {
+            await axios.post(`${__url}/student/upload/documents`, formData, {
                 headers: {
                     Authorization: `${Cookies.get("xvlf")}`,
                     "Content-Type": "multipart/form-data",

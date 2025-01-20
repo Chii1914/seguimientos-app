@@ -13,6 +13,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import Cookies from "js-cookie";
 import Swal from 'sweetalert2';
 import ModifyModal from "./components/modifyModal";
+import __url from '../lib/const'
 
 export default function Reports() {
   const [reload, setReload] = useState(false);
@@ -60,7 +61,7 @@ export default function Reports() {
     p: 4,
   };
   useEffect(() => {
-    axios.get('https://segapi.administracionpublica-uv.cl/api/user', { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+    axios.get(`${__url}/user`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       .then(response => {
         setUsers(response.data);
       })
@@ -117,7 +118,7 @@ export default function Reports() {
 
   const handleSubmit = async () => {
     try {
-      await axios.patch(`https://segapi.administracionpublica-uv.cl/api/user/${selectedUser.mail}`, newUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+      await axios.patch(`${__url}/user/${selectedUser.mail}`, newUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       setReload(!reload);
       handleClose();
       setNewUser({
@@ -142,7 +143,7 @@ export default function Reports() {
 
   const handleNewUser = async () => {
     try {
-      await axios.post(`https://segapi.administracionpublica-uv.cl/api/user`, createUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+      await axios.post(`${__url}/user`, createUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       setReload(!reload);
       handleCloseNew();
       setCreateUser({
@@ -178,7 +179,7 @@ export default function Reports() {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`https://segapi.administracionpublica-uv.cl/api/user/${mail}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+        await axios.delete(`${__url}/user/${mail}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
         setReload(!reload)
         handleClose();
         Swal.fire('Deleted!', 'The user has been deleted.', 'success');
