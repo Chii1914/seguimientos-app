@@ -1,5 +1,5 @@
 "use client";
-
+import __url from '../../main/lib/const';
 import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/app/main/lib/auth";
@@ -16,6 +16,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import FileUploadButton from "@/app/main/lib/filesButton";
+import { useTheme } from "@mui/material/styles";  // Importa useTheme
 
 interface PhotoState {
   photo: string | null;
@@ -32,6 +33,9 @@ export default function Reports() {
 
   // State to hold the consent checkbox value
   const [consent, setConsent] = useState(false);
+
+  // Usamos useTheme para acceder al tema global
+  const theme = useTheme(); 
 
   const handlePhotoUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -76,7 +80,7 @@ export default function Reports() {
 
     // Send the request to the backend using axios
     try {
-      const response = await axios.post(`https://segapi.administracionpublica-uv.cl/api/student/identificacion`, formData, {
+      const response = await axios.post(`${__url}/student/identificacion`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `${Cookies.get("xvlf")}`,
@@ -98,13 +102,13 @@ export default function Reports() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Typography variant="h4" className="text-center" gutterBottom>
+      <Typography variant="h4" color={theme.palette.text.primary} className="text-center" gutterBottom>
         Verficación y consentimiento del alumno
       </Typography>
       <Grid container spacing={3} justifyContent="center">
         {photos.map((photoState, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography variant="subtitle1" color={theme.palette.text.secondary} gutterBottom>
               {labels[index]}
             </Typography>
             <Card>
@@ -117,7 +121,7 @@ export default function Reports() {
                 />
               ) : (
                 <CardContent>
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color={theme.palette.text.secondary}>
                     No se ha subido ninguna foto
                   </Typography>
                 </CardContent>
@@ -166,7 +170,7 @@ export default function Reports() {
         </Button>
       </Box>
       <Box mt={4} className="text-center">
-        <Typography variant="h4" className="text-center" gutterBottom>
+        <Typography variant="h4" color={theme.palette.text.primary} className="text-center" gutterBottom>
           Documentos solicitados por el entrevistador
         </Typography>
         <FileUploadButton email={''} />
