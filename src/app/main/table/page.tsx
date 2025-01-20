@@ -5,6 +5,7 @@ import axios from 'axios';
 import FollowUpModal from '../components/followUpModals';
 import Cookies from "js-cookie";
 import Swal from 'sweetalert2'
+import __url from '../lib/const'
 
 export default function Table() {
   const [openModal, setOpenModal] = useState(false);
@@ -12,7 +13,7 @@ export default function Table() {
   const [studentId, setStudentId] = useState({
     mail: ''
   })
-
+//klaj
   const [studentData, setStudentData] = useState({
     mail: '',
     rut: 0,
@@ -98,7 +99,7 @@ export default function Table() {
 
   const handleSubmit = async (type: string) => {
     try {
-      const newStudent = await axios.post('https://segapi.administracionpublica-uv.cl/api/student/initialform', {
+      const newStudent = await axios.post(`${__url}/student/initialform`, {
         student: studentData,
         motive: motivesData
       }, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
@@ -167,7 +168,7 @@ export default function Table() {
 
   const handleAddFollowUp = async () => {
     try {
-      const followUpResponse = await axios.post('https://segapi.administracionpublica-uv.cl/api/student/add-follow-up', {
+      const followUpResponse = await axios.post(`${__url}/student/add-follow-up`, {
 
         follow_up: followUpData
       });
