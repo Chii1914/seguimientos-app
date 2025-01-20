@@ -3,15 +3,15 @@ import localFont from 'next/font/local';
 import { Roboto } from 'next/font/google';
 import { createTheme } from '@mui/material/styles';
 
-const Swiss721BT = localFont({
+const Swis721BT = localFont({
   src: [
-    { path: '../Utils/Swiss721BT.ttf', weight: '400' },
-    { path: '../Utils/Swiss721BT italic.ttf', weight: '400'},
-    { path: '../Utils/Swiss721BT bold.ttf', weight: '700' },
-    { path: '../Utils/Swiss721BT bold italic.ttf', weight: '700'},
-    { path: '../Utils/Swiss721BT CN.ttf', weight: '400' },
-    { path: '../Utils/Swiss721BT CN bold.ttf', weight: '700' },
-    { path: '../Utils/Swiss721BT CN bold italic.ttf', weight: '700'},
+    { path: 'Utils/Swis721BT.ttf', weight: '400' },
+    { path: 'Utils/Swis721BT italic.ttf', weight: '400'},
+    { path: 'Utils/Swis721BT bold.ttf', weight: '700' },
+    { path: 'Utils/Swis721BT bold italic.ttf', weight: '700'},
+    { path: 'Utils/Swis721BT CN.ttf', weight: '400' },
+    { path: 'Utils/Swis721BT CN bold.ttf', weight: '700' },
+    { path: 'Utils/Swis721BT CN bold italic.ttf', weight: '700'},
   ],
 });
 
@@ -24,8 +24,8 @@ const roboto = Roboto({
 
 const theme = createTheme({
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: Swis721BT.style.fontFamily,
   },
 });
 
-export default Swiss721BT;
+export default theme;
