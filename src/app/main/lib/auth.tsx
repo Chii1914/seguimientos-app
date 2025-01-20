@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import axios from "axios";
+import __url from "./const";
 
 export function useAuth() {
   const Router = useRouter();
@@ -10,7 +11,7 @@ export function useAuth() {
   async function verifyToken() {
 
     try {
-      const response = await axios.get("http://localhost:3000/api/auth/verify", {
+      const response = await axios.get(`${__url}/auth/verify`, {
         headers: {
           'Authorization': `${Cookies.get("xvlf")}`
         }
