@@ -182,7 +182,7 @@ export default function Reports() {
         await axios.delete(`${__url}/user/${mail}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
         setReload(!reload)
         handleClose();
-        Swal.fire('Deleted!', 'The user has been deleted.', 'success');
+        Swal.fire('Borrado!', 'El usuario a sido borrado.', 'success');
       } catch (err: any) {
         console.error(err);
         if (err.response.status === 403) {

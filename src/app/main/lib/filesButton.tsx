@@ -47,7 +47,6 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
 
         setUploading(true);
         setUploadSuccess(null);
-        console.log(files)
         try {
             await axios.post(`${__url}/student/upload/documents`, formData, {
                 headers: {
@@ -55,7 +54,6 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-
         } catch (error) {
             setUploadSuccess("Error occurred during upload. Please try again.");
         } finally {

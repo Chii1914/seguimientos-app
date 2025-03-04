@@ -6,6 +6,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from "./lib/auth";
+import Cookies from "js-cookie";
 
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
@@ -38,6 +39,12 @@ const Layout = ({ children }: { children: ReactNode }) => {
         break;
     }
   };
+
+  const logout = () => {
+    window.location.href = '/';
+    Cookies.remove('xvlf');
+  }
+
 
   const [state, setState] = useState({
     left: false,
@@ -96,7 +103,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Sistema de Seguimientos
           </Typography>
-          <Button color="inherit">Cerrar sesión</Button>
+          <Button color="inherit" onClick={() => logout()}>Cerrar sesión</Button>
         </Toolbar>
       </AppBar>
       <Drawer

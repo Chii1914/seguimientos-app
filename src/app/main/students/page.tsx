@@ -7,6 +7,8 @@ import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Selec
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
 import __url from "../lib/const";
+import Cookies from "js-cookie";
+
 export default function Students() {
 
 
@@ -92,7 +94,7 @@ export default function Students() {
   }, [selectedStudent]);
 
   useEffect(() => {
-    axios.get('http://localhost:6969/api/student')
+    axios.get(`${__url}/student`, {headers: {Authorization: `${Cookies.get('xvlf')}`}})
       .then(response => {
         setStudents(response.data);
       })
@@ -484,7 +486,7 @@ export default function Students() {
           <DataGrid
             rows={students}
             columns={columns}
-            getRowId={(row) => row._id}  // Use _id as the unique row identifier
+            getRowId={(row) => row.rut}  // Use _id as the unique row identifier
             sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
           />
         </Paper>

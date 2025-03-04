@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import FileUploadButton from "@/app/main/lib/filesButton";
 import { useTheme } from "@mui/material/styles";  // Importa useTheme
+import { Logout } from '@mui/icons-material';
 
 interface PhotoState {
   photo: string | null;
@@ -52,6 +53,12 @@ export default function Reports() {
     }
   };
 
+  const logout = () => {
+    window.location.href = '/';
+    Cookies.remove('xvlf');
+  }
+  
+
   const labels = ["Foto carnet anverso", "Foto carnet reverso"];
 
   const handleSubmit = async () => {
@@ -72,9 +79,11 @@ export default function Reports() {
     const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
 
     fileInputs.forEach((input, index) => {
-      if (input.files && input.files[0]) {
-        const fieldName = index === 0 ? 'anverso' : 'reverso';
-        formData.append(fieldName, input.files[0]);
+      if (index >= 2) {
+      input.value = ''; // Clear excess file inputs
+      } else if (input.files && input.files[0]) {
+      const fieldName = index === 0 ? 'anverso' : 'reverso';
+      formData.append(fieldName, input.files[0]);
       }
     });
 
@@ -89,6 +98,9 @@ export default function Reports() {
 
       if (response.status === 201) {
         setPhotos([{ photo: null }, { photo: null }]); // Reset photos
+        fileInputs.forEach((input) => {
+          input.value = ''; // Reset file input
+        });
         setConsent(false); // Reset consent checkbox
         alert("Fotos subidas correctamente");
       } else {
@@ -105,6 +117,8 @@ export default function Reports() {
       <Typography variant="h4" color={theme.palette.text.primary} className="text-center" gutterBottom>
         Verficación y consentimiento del alumno
       </Typography>
+      <Button onClick={() => logout()}>CERRAR SESIÓN <Logout></Logout> </Button>
+
       <Grid container spacing={3} justifyContent="center">
         {photos.map((photoState, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>

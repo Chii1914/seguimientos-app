@@ -17,7 +17,7 @@ export function useAuth() {
         }
       });
       if (response.status === 200) {
-        console.log("continue");
+        console.info("continue");
         return true;
       }
     } catch (error) {
