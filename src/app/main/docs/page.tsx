@@ -318,6 +318,7 @@ export default function Students() {
           Authorization: `${Cookies.get('xvlf')}`,
         }
       });
+      console.log(response.data)
       setFileData(response.data);
     } catch (error) {
       console.error('Error fetching file data:', error);

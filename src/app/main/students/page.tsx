@@ -1,17 +1,30 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { SelectChangeEvent } from '@mui/material';
-import {useAuth} from "../lib/auth";
+import { useAuth } from "../lib/auth";
 import axios from 'axios';
-import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Grid } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Table, Grid, CardContent } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import FollowUpModal from "../components/followUpModals";
 import __url from "../lib/const";
 import Cookies from "js-cookie";
+import FileUploadButton from "../lib/filesButton";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+
+interface FileData {
+  documentFiles: string[];
+  carnetFiles: string[];
+}
 
 export default function Students() {
 
-
+  const [fileData, setFileData] = useState<FileData>({ documentFiles: [], carnetFiles: [] });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [followUps, setFollowUps] = useState<any[]>([]); // State to store follow-ups
@@ -29,9 +42,9 @@ export default function Students() {
     convivencia: false,
     emocional: false,
     academico: false,
-    uvinclusiva: false,
+    uvInclusiva: false,
     abuso: false,
-    economicos: false,
+    economico: false,
     emocionalYAcademico: false,
     economicoEmocionalAcademico: false,
     economicoEmocional: false,
@@ -75,7 +88,8 @@ export default function Students() {
     otro: 'none',
   });
 
-
+ /* Quizás not fetchear los follow ups */
+ /*
   useEffect(() => {
     if (selectedStudent) {
       const fetchFollowUps = async () => {
@@ -92,9 +106,10 @@ export default function Students() {
       setFollowUps([]); // Clear follow-ups when no student is selected
     }
   }, [selectedStudent]);
+  */
 
   useEffect(() => {
-    axios.get(`${__url}/student`, {headers: {Authorization: `${Cookies.get('xvlf')}`}})
+    axios.get(`${__url}/student/motives`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       .then(response => {
         setStudents(response.data);
       })
@@ -131,21 +146,41 @@ export default function Students() {
     }
   };
 
-  const handleDownload = async (fileName: string) => {
+  const handleDownload = async (filename: string, category: string) => {
     try {
-      const response = await axios.get(`${__url}/student/download/${selectedStudent._id}/${fileName}`, {
-        responseType: 'blob'
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
+      // Construct the endpoint URL
+      const endpoint = `${__url}/student/download/${selectedStudent.mail}/${filename}/${category}`;
+
+      // Make a GET request to the backend with the correct responseType
+      const response = await axios.get(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+
+      if (response.data && response.data.file && Array.isArray(response.data.file.data)) {
+        // Convert the array of numbers (Buffer) to a Uint8Array
+        const fileBuffer = new Uint8Array(response.data.file.data);
+
+        // Create a Blob from the Uint8Array (binary data)
+        const fileBlob = new Blob([fileBuffer]);
+
+        // Create a URL for the Blob
+        const url = window.URL.createObjectURL(fileBlob);
+
+        // Create an anchor element to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', response.data.filename); // Use the filename from the response
+
+        // Trigger the download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+      } else {
+        console.error('Invalid response format:', response.data);
+      }
     } catch (error) {
       console.error('Error downloading file:', error);
     }
-  }
+  };
 
   const handleAddFollowUp = async () => {
     if (!selectedStudent) return;
@@ -180,26 +215,12 @@ export default function Students() {
         justNoAceptaIndicaciones: 'none',
         otro: 'none',
       });
-      fetchFollowUps(selectedStudent._id);
+      fetchFollowUps(selectedStudent.mail);
     } catch (error) {
       console.error('Error adding follow-up:', error);
     }
   }
-  const handleFileUpload = async (studentId: string) => {
-    if (files.length === 0) return;
 
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append('files', file);
-    });
-
-    try {
-      await axios.post(`${__url}/student/files/${studentId}`, formData);
-      fetchFileNames(studentId);
-    } catch (error) {
-      console.error('Error uploading files:', error);
-    }
-  }
 
   const handleSubmit = () => {
     setOpenModalFollowUp(true);
@@ -216,25 +237,31 @@ export default function Students() {
   };
 
   const handleModalOpen = async (student: any) => {
+    fetchFollowUps(student.mail);
     setSelectedStudent(student);
     setOpenModal(true);
-    fetchFileNames(student._id);
+    fetchFileNames(student.mail);
   };
 
-  const fetchFileNames = async (studentId: string) => {
+  const fetchFileNames = async (studentMail: string) => {
     try {
-      const response = await axios.get(`${__url}/student/${studentId}/filenames`);
-      setFileNames(response.data);
+      const response = await axios.get(`${__url}/student/filenames/${studentMail}`, {
+        headers: {
+          Authorization: `${Cookies.get('xvlf')}`,
+        }
+      });     
+      setFileData(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
     }
+    setLoading(false);
   };
 
 
   const handleModalClose = () => {
     setOpenModal(false);
     setSelectedStudent(null);
-    setFileNames([]);
+    setFileData({ documentFiles: [], carnetFiles: [] });
   };
 
   // Handle changes to text fields and checkboxes
@@ -246,21 +273,7 @@ export default function Students() {
   const handleUpdate = () => {
     if (!selectedStudent) return;
 
-    const { _id, follow_ups, __v, ...studentData } = selectedStudent;
-
-    axios.patch(`${__url}/student/${_id}`, studentData)
-      .then(response => {
-        setStudents((prevStudents: any[]) =>
-          prevStudents.map((student) =>
-            student._id === _id ? { ...student, ...studentData } : student
-          )
-        );
-        setOpenModal(false);
-        setSelectedStudent(null);
-      })
-      .catch(error => {
-        console.error('Error updating student:', error);
-      });
+    console.log(selectedStudent)
   };
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, student: any) => {
     setAnchorEl(event.currentTarget);
@@ -322,7 +335,7 @@ export default function Students() {
       sortable: false,
       filterable: false
     },
-  ]; 
+  ];
 
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
@@ -382,9 +395,9 @@ export default function Students() {
         <FormControlLabel
           control={
             <Checkbox
-              checked={filters.uvinclusiva}
+              checked={filters.uvInclusiva}
               onChange={handleFilterChange}
-              name="uvinclusiva"
+              name="uvInclusiva"
             />
           }
           label="UV Inclusiva (Neurodivergencia)"
@@ -406,9 +419,9 @@ export default function Students() {
         <FormControlLabel
           control={
             <Checkbox
-              checked={filters.economicos}
+              checked={filters.economico}
               onChange={handleFilterChange}
-              name="economicos"
+              name="economico"
             />
           }
           label="Económicos"
@@ -484,9 +497,9 @@ export default function Students() {
       <Box sx={{ flexGrow: 1 }}>
         <Paper elevation={3}>
           <DataGrid
-            rows={students}
+            rows={filteredStudents}
             columns={columns}
-            getRowId={(row) => row.rut}  // Use _id as the unique row identifier
+            getRowId={(row) => row.mail}  // Use _id as the unique row identifier
             sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
           />
         </Paper>
@@ -505,9 +518,11 @@ export default function Students() {
             padding: 4,
           }}
         >
+
           <Typography variant="h4" component="h2" gutterBottom>
             Información del Alumno
           </Typography>
+          <Button onClick={() => handleModalClose()}> Dejar de ver a este alumno </Button>
 
           <Button variant="contained" color="primary" onClick={() => handleSubmit()}>
             Añadir Seguimiento a este alumno
@@ -589,19 +604,26 @@ export default function Students() {
                 sx={{ bgcolor: '#f9f9f9' }}
               >
                 {[
-                  'Primer Semestre', 'Segundo Semestre', 'Tercer Semestre', 'Cuarto Semestre',
-                  'Quinto Semestre', 'Sexto Semestre', 'Séptimo Semestre', 'Octavo Semestre',
-                  'Noveno Semestre', 'Décimo Semestre'
+                  { value: 1, label: 'Primer Semestre' },
+                  { value: 2, label: 'Segundo Semestre' },
+                  { value: 3, label: 'Tercer Semestre' },
+                  { value: 4, label: 'Cuarto Semestre' },
+                  { value: 5, label: 'Quinto Semestre' },
+                  { value: 6, label: 'Sexto Semestre' },
+                  { value: 7, label: 'Séptimo Semestre' },
+                  { value: 8, label: 'Octavo Semestre' },
+                  { value: 9, label: 'Noveno Semestre' },
+                  { value: 10, label: 'Décimo Semestre' }
                 ].map((semester) => (
-                  <MenuItem key={semester} value={semester}>
-                    {semester}
+                  <MenuItem key={semester.value} value={semester.value}>
+                    {semester.label}
                   </MenuItem>
                 ))}
               </Select>
 
               <TextField
                 label="Email"
-                value={selectedStudent.email || ''}
+                value={selectedStudent.mail || ''}
                 onChange={(e) => handleChange('email', e.target.value)}
                 fullWidth
                 margin="normal"
@@ -615,14 +637,19 @@ export default function Students() {
                 margin="normal"
                 sx={{ bgcolor: '#f9f9f9' }}
               />
-              <TextField
+              <Typography variant="h6" sx={{ color: '#000', marginTop: '3px', marginBottom: '3px' }}>Ubicación</Typography>
+              <Select
                 label="Ubicación"
-                value={selectedStudent.location || ''}
-                onChange={(e) => handleChange('location', e.target.value)}
+                value={selectedStudent.sede || ''}
+                onChange={(e) => handleChange('sede', e.target.value)}
                 fullWidth
-                margin="normal"
+                margin="dense"
                 sx={{ bgcolor: '#f9f9f9' }}
-              />
+              >
+                <MenuItem value="Valparaíso">Valparaíso</MenuItem>
+                <MenuItem value="Santiago">Santiago</MenuItem>
+                <MenuItem value="San Felipe">San Felipe</MenuItem>
+              </Select>
               <FormControlLabel
                 control={<Checkbox checked={selectedStudent.consumoSustancias || false} onChange={(e) => handleChange('consumoSustancias', e.target.checked)} />}
                 label="Consumo Problemático de Sustancias"
@@ -704,14 +731,14 @@ export default function Students() {
 
               {/* Checkbox and justification for "UV Inclusiva (Neurodivergencia)" */}
               <FormControlLabel
-                control={<Checkbox checked={selectedStudent.uvinclusiva || false} onChange={(e) => handleChange('uvinclusiva', e.target.checked)} />}
+                control={<Checkbox checked={selectedStudent.uvInclusiva || false} onChange={(e) => handleChange('uvInclusiva', e.target.checked)} />}
                 label="UV Inclusiva (Neurodivergencia)"
               />
-              {selectedStudent.uvinclusiva && (
+              {selectedStudent.uvInclusiva && (
                 <TextField
                   label="Justificación"
-                  value={selectedStudent.justUvinclusiva || ''}
-                  onChange={(e) => handleChange('justUvinclusiva', e.target.value)}
+                  value={selectedStudent.justUvInclusiva || ''}
+                  onChange={(e) => handleChange('justUvInclusiva', e.target.value)}
                   fullWidth
                   margin="normal"
                   sx={{ bgcolor: '#f9f9f9' }}
@@ -736,14 +763,14 @@ export default function Students() {
 
               {/* Checkbox and justification for "Económicos" */}
               <FormControlLabel
-                control={<Checkbox checked={selectedStudent.economicos || false} onChange={(e) => handleChange('economicos', e.target.checked)} />}
+                control={<Checkbox checked={selectedStudent.economico || false} onChange={(e) => handleChange('economico', e.target.checked)} />}
                 label="Económicos"
               />
-              {selectedStudent.economicos && (
+              {selectedStudent.economico && (
                 <TextField
                   label="Justificación"
-                  value={selectedStudent.justEconomicos || ''}
-                  onChange={(e) => handleChange('justEconomicos', e.target.value)}
+                  value={selectedStudent.justEconomico || ''}
+                  onChange={(e) => handleChange('justEconomico', e.target.value)}
                   fullWidth
                   margin="normal"
                   sx={{ bgcolor: '#f9f9f9' }}
@@ -800,41 +827,62 @@ export default function Students() {
 
               <Paper sx={{ mt: 4, p: 2 }}>
                 <Box sx={{ mt: 4 }}>
-                  <Typography variant="h6">Archivos Subidos</Typography>
-                  {fileNames.length > 0 ? (
-                    <ul>
-                      {fileNames.map((fileName, index) => (
-                        <>
-                          <li key={index}>{fileName}</li>
-                          <Button variant="contained" color="primary" onClick={() => handleDownload(fileName)}> Descargar </Button>
-                        </>
-                      ))}
-                    </ul>
-                  ) : (
-                    <Typography variant="body2">No hay archivos subidos para este estudiante</Typography>
-                  )}
+                  <CardContent>
+                    <Typography variant="h5" component="div" gutterBottom>
+                      Archivos del alumno
+                    </Typography>
+                    {loading ? (
+                      <Typography variant="body2">Cargando archivos...</Typography>
+                    ) : error ? (
+                      <Typography variant="body2" color="error">
+                        {error}
+                      </Typography>
+                    ) : (
+                      <TableContainer>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell><strong>Tipo</strong></TableCell>
+                              <TableCell><strong>Archivo</strong></TableCell>
+                              <TableCell><strong>Acciones</strong></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {Object.entries(fileData).map(([category, files]) =>
+                              Array.isArray(files) ? (
+                                files.map((filename: string, index: number) => (
+                                  <TableRow key={`${category}-${filename}-${index}`}>
+                                    <TableCell>{category === "documentos" ? "Documento" : <strong>Carnet</strong>}</TableCell>
+                                    <TableCell>{filename}</TableCell>
+                                    <TableCell>
+                                      <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => handleDownload(filename, category)}
+                                      >
+                                        Descargar
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                              ) : (
+                                <TableRow key={category}>
+                                  <TableCell colSpan={3} style={{ textAlign: 'center' }}>
+                                    No se encontraron archivos del alumno.
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            )}
+
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </CardContent>
                 </Box>
                 <Box>
                   <Typography variant="h6">Subir Archivos</Typography>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      if (files) {
-                        setFiles(Array.from(files));
-                      }
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleFileUpload(selectedStudent._id)}
-                    sx={{ mt: 2 }}
-                  >
-                    Subir Archivos
-                  </Button>
-
+                  <FileUploadButton email={selectedStudent.mail} />
                 </Box>
               </Paper>
 

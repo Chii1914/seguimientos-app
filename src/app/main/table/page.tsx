@@ -6,6 +6,7 @@ import FollowUpModal from '../components/followUpModals';
 import Cookies from "js-cookie";
 import Swal from 'sweetalert2'
 import __url from '../lib/const'
+import FileUploadButton from "../lib/filesButton";
 
 export default function Table() {
   const [openModal, setOpenModal] = useState(false);
@@ -528,7 +529,7 @@ export default function Table() {
               <Grid item xs={12}>
                 <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Certificados</Typography>
                 <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
-
+                <FileUploadButton email={studentData.mail} />
               </Grid>
 
               <Grid item xs={12}>
