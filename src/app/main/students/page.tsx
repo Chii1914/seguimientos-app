@@ -14,6 +14,11 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Swal from "sweetalert2";
+import { InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+
+
 
 interface FileData {
   documentFiles: string[];
@@ -21,6 +26,7 @@ interface FileData {
 }
 
 export default function Students() {
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [fileData, setFileData] = useState<FileData>({ documentFiles: [], carnetFiles: [] });
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +57,22 @@ export default function Students() {
     economicoAcademico: false,
     state: 'all'
   });
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value.toLowerCase()); // Normalize search query
+  };
+  useEffect(() => {
+    const filtered = students.filter((student) => {
+      return (
+        student.name.toLowerCase().includes(searchQuery) ||
+        student.secondName.toLowerCase().includes(searchQuery) ||
+        student.fatherLastName.toLowerCase().includes(searchQuery) ||
+        student.motherLastName.toLowerCase().includes(searchQuery) 
+      );
+    });
+
+    setFilteredStudents(filtered);
+  }, [searchQuery, students]);
+
 
   const handleFilterChange = (
     event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
@@ -75,38 +97,38 @@ export default function Students() {
   }, [filters, students]);
 
   const [followUpData, setFollowUpData] = useState({
-    date: '',
+    timestamp: '',
     notes: '',
     asistentaSocial: false,
-    justAsistentaSocial: 'none',
+    justAsistentaSocial: '',
     ajusteAcademico: false,
-    justAjusteAcademico: 'none',
-    documentoRespaldo: false,
-    justDocumentoRespaldo: 'none',
+    justAjusteAcademico: '',
+    documentosRespaldo: false,
+    justDocumentosRespaldo: '',
     noAceptaIndicaciones: false,
-    justNoAceptaIndicaciones: 'none',
-    otro: 'none',
+    justNoAceptaIndicaciones: '',
+    otro: '',
   });
 
- /* Quizás not fetchear los follow ups */
- /*
-  useEffect(() => {
-    if (selectedStudent) {
-      const fetchFollowUps = async () => {
-        try {
-          const response = await axios.get(`${__url}/${selectedStudent._id}/follow-ups`);
-          setFollowUps(response.data);
-        } catch (error) {
-          console.error('Error fetching follow-ups:', error);
-        }
-      };
-
-      fetchFollowUps();
-    } else {
-      setFollowUps([]); // Clear follow-ups when no student is selected
-    }
-  }, [selectedStudent]);
-  */
+  /* Quizás not fetchear los follow ups */
+  /*
+   useEffect(() => {
+     if (selectedStudent) {
+       const fetchFollowUps = async () => {
+         try {
+           const response = await axios.get(`${__url}/${selectedStudent._id}/follow-ups`);
+           setFollowUps(response.data);
+         } catch (error) {
+           console.error('Error fetching follow-ups:', error);
+         }
+       };
+ 
+       fetchFollowUps();
+     } else {
+       setFollowUps([]); // Clear follow-ups when no student is selected
+     }
+   }, [selectedStudent]);
+   */
 
   useEffect(() => {
     axios.get(`${__url}/student/motives`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
@@ -139,7 +161,7 @@ export default function Students() {
 
   const fetchFollowUps = async (studentId: string) => {
     try {
-      const response = await axios.get(`${__url}/student/${studentId}/follow-ups`);
+      const response = await axios.get(`${__url}/follow-up/${studentId}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
       setFollowUps(response.data);
     } catch (error) {
       console.error('Error fetching follow-ups:', error);
@@ -183,37 +205,30 @@ export default function Students() {
   };
 
   const handleAddFollowUp = async () => {
+
     if (!selectedStudent) return;
-    const followUp = {
-      ...followUpData,
-      asistentaSocial: followUpData.asistentaSocial || false,
-      justAsistentaSocial: followUpData.asistentaSocial ? followUpData.justAsistentaSocial : 'none',
-      ajusteAcademico: followUpData.ajusteAcademico || false,
-      justAjusteAcademico: followUpData.ajusteAcademico ? followUpData.justAjusteAcademico : 'none',
-      documentoRespaldo: followUpData.documentoRespaldo || false,
-      justDocumentoRespaldo: followUpData.documentoRespaldo ? followUpData.justDocumentoRespaldo : 'none',
-      noAceptaIndicaciones: followUpData.noAceptaIndicaciones || false,
-      justNoAceptaIndicaciones: followUpData.noAceptaIndicaciones ? followUpData.justNoAceptaIndicaciones : 'none',
-      otro: followUpData.otro || 'none',
-    };
+
     try {
-      await axios.post(`${__url}/student/add-follow-up`, {
-        id: selectedStudent._id,
-        follow_up: followUp,
+      await axios.post(`${__url}/follow-up/${selectedStudent.mail}`, { followUpData }, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+      Swal.fire({
+        icon: 'success',
+        title: 'Seguimiento añadido correctamente',
+        showConfirmButton: false,
+        timer: 1500
       });
       setOpenModalFollowUp(false);
       setFollowUpData({
-        date: '',
+        timestamp: '',
         notes: '',
         asistentaSocial: false,
-        justAsistentaSocial: 'none',
+        justAsistentaSocial: '',
         ajusteAcademico: false,
-        justAjusteAcademico: 'none',
-        documentoRespaldo: false,
-        justDocumentoRespaldo: 'none',
+        justAjusteAcademico: '',
+        documentosRespaldo: false,
+        justDocumentosRespaldo: '',
         noAceptaIndicaciones: false,
-        justNoAceptaIndicaciones: 'none',
-        otro: 'none',
+        justNoAceptaIndicaciones: '',
+        otro: '',
       });
       fetchFollowUps(selectedStudent.mail);
     } catch (error) {
@@ -249,7 +264,7 @@ export default function Students() {
         headers: {
           Authorization: `${Cookies.get('xvlf')}`,
         }
-      });     
+      });
       setFileData(response.data);
     } catch (error) {
       console.error('Error fetching file names:', error);
@@ -270,10 +285,23 @@ export default function Students() {
   };
 
   // Handle update request
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!selectedStudent) return;
-
-    console.log(selectedStudent)
+    try{
+      
+      await axios.patch(`${__url}/student/motives/${selectedStudent.mail}`, selectedStudent, {headers: {Authorization: `${Cookies.get('xvlf')}`}});
+      setReload(!reload);
+      Swal.fire({
+        icon: 'success',
+        title: 'Alumno actualizado correctamente',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      handleModalClose();
+    } catch (error) {
+      console.error('Error updating student:', error);
+    }
+    
   };
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, student: any) => {
     setAnchorEl(event.currentTarget);
@@ -495,6 +523,21 @@ export default function Students() {
       </Grid>
 
       <Box sx={{ flexGrow: 1 }}>
+        <TextField
+          label="Buscar alumno"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={handleSearchChange}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ marginBottom: 2 }}
+        />
         <Paper elevation={3}>
           <DataGrid
             rows={filteredStudents}
@@ -604,19 +647,19 @@ export default function Students() {
                 sx={{ bgcolor: '#f9f9f9' }}
               >
                 {[
-                  { value: 1, label: 'Primer Semestre' },
-                  { value: 2, label: 'Segundo Semestre' },
-                  { value: 3, label: 'Tercer Semestre' },
-                  { value: 4, label: 'Cuarto Semestre' },
-                  { value: 5, label: 'Quinto Semestre' },
-                  { value: 6, label: 'Sexto Semestre' },
-                  { value: 7, label: 'Séptimo Semestre' },
-                  { value: 8, label: 'Octavo Semestre' },
-                  { value: 9, label: 'Noveno Semestre' },
-                  { value: 10, label: 'Décimo Semestre' }
+                  { value: '1', label: 'Primer Semestre' },
+                  { value: '2', label: 'Segundo Semestre' },
+                  { value: '3', label: 'Tercer Semestre' },
+                  { value: '4', label: 'Cuarto Semestre' },
+                  { value: '5', label: 'Quinto Semestre' },
+                  { value: '6', label: 'Sexto Semestre' },
+                  { value: '7', label: 'Séptimo Semestre' },
+                  { value: '8', label: 'Octavo Semestre' },
+                  { value: '9', label: 'Noveno Semestre' },
+                  { value: '10', label: 'Décimo Semestre' }
                 ].map((semester) => (
                   <MenuItem key={semester.value} value={semester.value}>
-                    {semester.label}
+                  {semester.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -891,9 +934,9 @@ export default function Students() {
                   <Typography variant="h6">Seguimientos Realizados</Typography>
                   {followUps.length > 0 ? (
                     followUps.map((followUp, index) => (
-                      <Box key={followUp?._id || index} sx={{ mt: 2, p: 2, border: '1px solid #ccc' }}>
+                      <Box key={followUp?.timestamp || index} sx={{ mt: 2, p: 2, border: '1px solid #ccc' }}>
                         <Typography variant="body1">
-                          <strong>#{index + 1}</strong> Fecha: {followUp?.date ? new Date(followUp.date).toLocaleDateString() : 'Fecha no disponible'}
+                          <strong>#{index + 1}</strong> Fecha: {followUp?.timestamp ? new Date(followUp.timestamp).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Fecha no disponible'}
                         </Typography>
                         <Typography variant="body1">Notas: {followUp?.notes || 'Notas no disponibles'}</Typography>
 
@@ -917,11 +960,11 @@ export default function Students() {
                         )}
 
                         <Typography variant="body1">
-                          Documento de Respaldo: {followUp?.documentoRespaldo ? 'Sí' : 'No'}
+                          Documento de Respaldo: {followUp?.documentosRespaldo ? 'Sí' : 'No'}
                         </Typography>
-                        {followUp?.documentoRespaldo && (
+                        {followUp?.documentosRespaldo && (
                           <Typography variant="body2">
-                            Justificación: {followUp?.justDocumentoRespaldo || 'No especificado'}
+                            Justificación: {followUp?.justDocumentosRespaldo || 'No especificado'}
                           </Typography>
                         )}
 

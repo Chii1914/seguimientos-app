@@ -1,6 +1,10 @@
 'use client';
 import React from 'react';
 import { Box, Button, Modal, TextField, Typography, FormControlLabel, Checkbox } from "@mui/material";
+import dayjs from 'dayjs';
+import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 interface FollowUpModalProps {
   open: boolean;
@@ -17,7 +21,7 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
   setFollowUpData,
   handleAddFollowUp,
 }) => {
-  
+
   const handleCheckboxChange = (name: string, checked: boolean) => {
     setFollowUpData((prev: any) => ({
       ...prev,
@@ -47,18 +51,18 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
         </Typography>
 
         {/* Date field */}
-        <TextField
-          label="Fecha"
-          type="date"
-          name="date"
-          value={followUpData.date}
-          onChange={(e) => setFollowUpData({ ...followUpData, date: e.target.value })}
-          fullWidth
-          margin="normal"
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+        
+        <Typography id="follow-up-modal-description" variant="body1" component="p" color='black'>
+          Fecha seleccionada: {followUpData.timestamp}
+        </Typography>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <StaticDateTimePicker
+            displayStaticWrapperAs="desktop"
+            value={dayjs(followUpData.timestamp, 'DD-MM-YYYY HH:mm')}
+            onChange={(newValue) => setFollowUpData({ ...followUpData, timestamp: newValue?.format('DD-MM-YYYY HH:mm') })}
+            ampm={false} 
+          />
+        </LocalizationProvider>
 
         {/* Notes field */}
         <TextField
@@ -100,14 +104,14 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
         )}
 
         <FormControlLabel
-          control={<Checkbox checked={followUpData.documentoRespaldo || false} onChange={(e) => handleCheckboxChange('documentoRespaldo', e.target.checked)} />}
+          control={<Checkbox checked={followUpData.documentosRespaldo || false} onChange={(e) => handleCheckboxChange('documentosRespaldo', e.target.checked)} />}
           label="Documento de Respaldo"
         />
-        {followUpData.documentoRespaldo && (
+        {followUpData.documentosRespaldo && (
           <TextField
             label="Justificación Documento de Respaldo"
-            value={followUpData.justDocumentoRespaldo || ''}
-            onChange={(e) => setFollowUpData({ ...followUpData, justDocumentoRespaldo: e.target.value })}
+            value={followUpData.justDocumentosRespaldo || ''}
+            onChange={(e) => setFollowUpData({ ...followUpData, justDocumentosRespaldo: e.target.value })}
             fullWidth
             margin="normal"
           />
