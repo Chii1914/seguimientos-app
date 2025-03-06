@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Cookies from "js-cookie";
 import axios from 'axios';
 import __url from "./const";
+import Swal from "sweetalert2";
 
 interface FileWithPreview {
     file: File;
@@ -58,7 +59,20 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
             setUploadSuccess("Error occurred during upload. Please try again.");
         } finally {
             setUploading(false);
-            alert(`Archivos subidos correctamente`);
+
+            Swal.fire({
+                icon: "success",
+                title: "¡Éxito!",
+                text: "Archivos subidos exitosamente",
+                willOpen: () => {
+                    // Optional: Can set z-index higher to ensure it's on top
+                    const swalContainer = document.querySelector('.swal2-container');
+                    if (swalContainer) {
+                        (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+                    }
+                }
+            });
+
             setFiles([]);
         }
     };

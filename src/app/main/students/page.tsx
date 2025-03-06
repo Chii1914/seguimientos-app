@@ -66,7 +66,7 @@ export default function Students() {
         student.name.toLowerCase().includes(searchQuery) ||
         student.secondName.toLowerCase().includes(searchQuery) ||
         student.fatherLastName.toLowerCase().includes(searchQuery) ||
-        student.motherLastName.toLowerCase().includes(searchQuery) 
+        student.motherLastName.toLowerCase().includes(searchQuery)
       );
     });
 
@@ -204,6 +204,57 @@ export default function Students() {
     }
   };
 
+  const handleDelete = async (filename: string, category: string) => {
+    // Show the SweetAlert confirmation before displaying any modals
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "No podrás revertir esto",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, borrar',
+      cancelButtonText: 'Cancelar',
+      backdrop: true, // Optional: Makes background darker while Swal is visible
+      willOpen: () => {
+        // Optional: Can set z-index higher to ensure it's on top
+        const swalContainer = document.querySelector('.swal2-container');
+        if (swalContainer) {
+          (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+        }
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const endpoint = `${__url}/student/delete/${selectedStudent.mail}/${filename}/${category}`;
+        await axios.delete(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+
+        Swal.fire({
+          title: '¡Borrado!',
+          text: 'El archivo ha sido borrado.',
+          icon: 'success',
+          willOpen: () => {
+            // Optional: Can set z-index higher to ensure it's on top
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) {
+              (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+            }
+          }
+        });
+        fetchFileNames(selectedStudent.mail); // Refresh the file list
+      } catch (error) {
+        console.error('Error deleting file:', error);
+        Swal.fire(
+          'Error',
+          'Hubo un problema al borrar el archivo.',
+          'error'
+        );
+      }
+    }
+  };
+
+
   const handleAddFollowUp = async () => {
 
     if (!selectedStudent) return;
@@ -287,9 +338,9 @@ export default function Students() {
   // Handle update request
   const handleUpdate = async () => {
     if (!selectedStudent) return;
-    try{
-      
-      await axios.patch(`${__url}/student/motives/${selectedStudent.mail}`, selectedStudent, {headers: {Authorization: `${Cookies.get('xvlf')}`}});
+    try {
+
+      await axios.patch(`${__url}/student/motives/${selectedStudent.mail}`, selectedStudent, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
       setReload(!reload);
       Swal.fire({
         icon: 'success',
@@ -301,7 +352,7 @@ export default function Students() {
     } catch (error) {
       console.error('Error updating student:', error);
     }
-    
+
   };
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, student: any) => {
     setAnchorEl(event.currentTarget);
@@ -659,7 +710,7 @@ export default function Students() {
                   { value: '10', label: 'Décimo Semestre' }
                 ].map((semester) => (
                   <MenuItem key={semester.value} value={semester.value}>
-                  {semester.label}
+                    {semester.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -904,6 +955,14 @@ export default function Students() {
                                         onClick={() => handleDownload(filename, category)}
                                       >
                                         Descargar
+                                      </Button>
+
+                                      <Button
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => handleDelete(filename, category)}
+                                      >
+                                        Borrar
                                       </Button>
                                     </TableCell>
                                   </TableRow>

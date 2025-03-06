@@ -103,6 +103,55 @@ export default function Students() {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
+  const handleDelete = async (filename: string, category: string) => {
+    // Show the SweetAlert confirmation before displaying any modals
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "No podrás revertir esto",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, borrar',
+      cancelButtonText: 'Cancelar',
+      backdrop: true, // Optional: Makes background darker while Swal is visible
+      willOpen: () => {
+        // Optional: Can set z-index higher to ensure it's on top
+        const swalContainer = document.querySelector('.swal2-container');
+        if (swalContainer) {
+          (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+        }
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const endpoint = `${__url}/student/delete/${selectedStudent.mail}/${filename}/${category}`;
+        await axios.delete(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+
+        Swal.fire({
+          title: '¡Borrado!',
+          text: 'El archivo ha sido borrado.',
+          icon: 'success',
+          willOpen: () => {
+            // Optional: Can set z-index higher to ensure it's on top
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) {
+              (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+            }
+          }
+        });
+        fetchFileNames(selectedStudent.mail); // Refresh the file list
+      } catch (error) {
+        console.error('Error deleting file:', error);
+        Swal.fire(
+          'Error',
+          'Hubo un problema al borrar el archivo.',
+          'error'
+        );
+      }
+    }
+  };
 
   useEffect(() => {
     axios.get(`${__url}/student`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
@@ -473,7 +522,7 @@ export default function Students() {
               <Typography variant="h5" component="div">
                 Solicitar documento via email, escribalos a continuación
               </Typography>
-              
+
               <TextField id='message' label='Ingrese los documentos.' variant='outlined'></TextField>
             </CardContent>
             <CardActions>
@@ -530,6 +579,13 @@ export default function Students() {
                                   onClick={() => handleDownload(filename, category)}
                                 >
                                   Descargar
+                                </Button>
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  onClick={() => handleDelete(filename, category)}
+                                >
+                                  Borrar
                                 </Button>
                               </TableCell>
                             </TableRow>
