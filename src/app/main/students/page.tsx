@@ -69,7 +69,7 @@ export default function Students() {
     setSearchQuery(event.target.value.toLowerCase()); // Normalize search query
   };
   useEffect(() => {
-    const filtered = students.filter((student) => {
+    const filtered = (students || []).filter((student) => {
       return (
         student.name.toLowerCase().includes(searchQuery) ||
         student.secondName.toLowerCase().includes(searchQuery) ||
@@ -77,7 +77,6 @@ export default function Students() {
         student.motherLastName.toLowerCase().includes(searchQuery)
       );
     });
-
     setFilteredStudents(filtered);
   }, [searchQuery, students]);
 
@@ -168,10 +167,16 @@ export default function Students() {
   useEffect(() => {
     axios.get(`${__url}/student/motives`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
       .then(response => {
-        setStudents(response.data);
+        if (Array.isArray(response.data)) {
+          setStudents(response.data);
+        } else {
+          console.error("Unexpected API response format", response.data);
+          setStudents([]);
+        }
       })
       .catch(error => {
         console.error('Error fetching students:', error);
+        setStudents([]); // Ensure it's always an array
       });
   }, [reload]);
 
