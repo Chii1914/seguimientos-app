@@ -26,7 +26,7 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
     setFollowUpData((prev: any) => ({
       ...prev,
       [name]: checked,
-      [`just${name.charAt(0).toUpperCase() + name.slice(1)}`]: checked ? prev[`just${name.charAt(0).toUpperCase() + name.slice(1)}`] : 'none',
+      [`just${name.charAt(0).toUpperCase() + name.slice(1)}`]: checked ? prev[`just${name.charAt(0).toUpperCase() + name.slice(1)}`] : '',
     }));
   };
 

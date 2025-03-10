@@ -7,11 +7,12 @@ export default function Reports() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <Typography
-              variant="h1"
+              variant="h2"
               className="text-center"
             >
-             Reports
+             Reportes, sin implementar
             </Typography>
+            
     </main>
   );
 }

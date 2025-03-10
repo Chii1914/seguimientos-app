@@ -17,7 +17,11 @@ import TableRow from "@mui/material/TableRow";
 import Swal from "sweetalert2";
 import { InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import Radio from '@mui/material/Radio';
 
 
 interface FileData {
@@ -55,8 +59,12 @@ export default function Students() {
     economicoEmocionalAcademico: false,
     economicoEmocional: false,
     economicoAcademico: false,
-    state: 'all'
+    state: 'all',
+    verified: true
   });
+
+  const [value, setValue] = React.useState('verificado');
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value.toLowerCase()); // Normalize search query
   };
@@ -75,26 +83,53 @@ export default function Students() {
 
 
   const handleFilterChange = (
-    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
   ) => {
-    const { name, value } = event.target as HTMLInputElement | { name: string; value: string };
-    const checked = (event.target as HTMLInputElement).checked;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: (event.target as HTMLInputElement).type === 'checkbox' ? checked : value,
-    }));
+    const { name, value } = event.target as { name: string; value: string };
+
+    // Check if the event is from a checkbox
+    if ("checked" in event.target) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [name]: (event.target as HTMLInputElement).checked, // Use checked for checkboxes
+      }));
+    } else {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [name]: name === "verified" ? value === "true" : value, // Convert "true"/"false" to boolean
+      }));
+    }
   };
   useEffect(() => {
     const filtered = students.filter((student) => {
+      if (filters.state !== "all" && student.state !== (filters.state === "procesado")) {
+        return false;
+      }
+
+      if (filters.verified === false && student.verified === true) {
+        return false;
+      }
+
       return Object.keys(filters).every((key) => {
-        if (filters[key as keyof typeof filters]) {
+        if (key === "verified") {
+          return student.verified === filters.verified;
+        }
+        if (typeof filters[key as keyof typeof filters] === "boolean" && filters[key as keyof typeof filters]) {
           return student[key] === true;
         }
         return true;
       });
     });
+
     setFilteredStudents(filtered);
   }, [filters, students]);
+
+  const radioControl = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      verified: event.target.value === "true", // Convert to boolean
+    }));
+  };
 
   const [followUpData, setFollowUpData] = useState({
     timestamp: '',
@@ -265,7 +300,14 @@ export default function Students() {
         icon: 'success',
         title: 'Seguimiento añadido correctamente',
         showConfirmButton: false,
-        timer: 1500
+        timer: 1500,
+        willOpen: () => {
+          // Optional: Can set z-index higher to ensure it's on top
+          const swalContainer = document.querySelector('.swal2-container');
+          if (swalContainer) {
+            (swalContainer as HTMLElement).style.zIndex = '999999';  // Higher than most modals
+          }
+        }
       });
       setOpenModalFollowUp(false);
       setFollowUpData({
@@ -382,6 +424,19 @@ export default function Students() {
     { field: 'semester', headerName: 'Semestre', width: 100 },
     { field: 'rut', headerName: 'RUT', width: 150 },
     {
+      field: "verified",
+      headerName: "Verificado",
+      width: 100,
+      renderCell: (params) => (
+        <Box >
+          {params.value ? (
+            <CheckCircle color="success" />
+          ) : (
+            <Cancel color="error" />
+          )}
+        </Box>
+      ),
+    }, {
       field: 'actions',
       headerName: 'Acciones',
       width: 300,
@@ -398,6 +453,14 @@ export default function Students() {
             >
               Procesar
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={(event) => handleMenuOpen(event, params.row)}
+            >
+              exportar
+            </Button>
+
 
             {/* Menu for state change */}
             <Menu
@@ -417,187 +480,105 @@ export default function Students() {
   ];
 
   return (
-    <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ mb: 2, px: 2 }}>
-        <Button variant="outlined" color="primary">Exportar todos los estudiantes</Button>
-        <Button variant="outlined" color="secondary" sx={{ ml: 2 }}>Exportar por rango de fecha</Button>
+    <Box sx={{ height: "100vh", width: "100vw", display: "flex", flexDirection: "column", p: 2 }}>
+      {/* Header Section */}
+      <Box sx={{ mb: 2, display: "flex", gap: 2 }}>
+        <Button variant="outlined" color="primary">
+          Exportar todos los estudiantes
+        </Button>
+        <Button variant="outlined" color="secondary">
+          Exportar por rango de fecha
+        </Button>
       </Box>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.consumoSustancias}
-              onChange={handleFilterChange}
-              name="consumoSustancias"
-            />
-          }
-          label="Consumo Problemático de Sustancias"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.convivencia}
-              onChange={handleFilterChange}
-              name="convivencia"
-            />
-          }
-          label="Convivencia y Buen Trato"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.emocional}
-              onChange={handleFilterChange}
-              name="emocional"
-            />
-          }
-          label="Emocional"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.academico}
-              onChange={handleFilterChange}
-              name="academico"
-            />
-          }
-          label="Académico"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.uvInclusiva}
-              onChange={handleFilterChange}
-              name="uvInclusiva"
-            />
-          }
-          label="UV Inclusiva (Neurodivergencia)"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.abuso}
-              onChange={handleFilterChange}
-              name="abuso"
-            />
-          }
-          label="Violencia Física-Psicológica, Abuso"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.economico}
-              onChange={handleFilterChange}
-              name="economico"
-            />
-          }
-          label="Económicos"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.emocionalYAcademico}
-              onChange={handleFilterChange}
-              name="emocionalYAcademico"
-            />
-          }
-          label="Emocional y Académico"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.economicoEmocionalAcademico}
-              onChange={handleFilterChange}
-              name="economicoEmocionalAcademico"
-            />
-          }
-          label="Económico, Emocional y Académico"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.economicoEmocional}
-              onChange={handleFilterChange}
-              name="economicoEmocional"
-            />
-          }
-          label="Económico y Emocional"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filters.economicoAcademico}
-              onChange={handleFilterChange}
-              name="economicoAcademico"
-            />
-          }
-          label="Económico y Académico"
-        />
-      </Grid>
-      <Grid item>
-        <FormControlLabel
-          control={
-            <Select
-              name="state"
-              value={filters.state}
-              onChange={handleFilterChange}
-              displayEmpty
-            >
-              <MenuItem value="all">Todos</MenuItem>
-              <MenuItem value="pendiente">Pendiente</MenuItem>
-              <MenuItem value="procesado">Procesado</MenuItem>
-            </Select>
-          }
-          label="Estado"
-          labelPlacement="start"
-        />
-      </Grid>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <FormLabel component="legend">Filtros</FormLabel>
+          </Grid>
 
-      <Box sx={{ flexGrow: 1 }}>
-        <TextField
-          label="Buscar alumno"
-          variant="outlined"
-          fullWidth
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ marginBottom: 2 }}
+          {[
+            { name: "consumoSustancias", label: "Consumo Problemático de Sustancias" },
+            { name: "convivencia", label: "Convivencia y Buen Trato" },
+            { name: "emocional", label: "Emocional" },
+            { name: "academico", label: "Académico" },
+            { name: "uvInclusiva", label: "UV Inclusiva (Neurodivergencia)" },
+            { name: "abuso", label: "Violencia Física-Psicológica, Abuso" },
+            { name: "economico", label: "Económicos" },
+            { name: "emocionalYAcademico", label: "Emocional y Académico" },
+            { name: "economicoEmocionalAcademico", label: "Económico, Emocional y Académico" },
+            { name: "economicoEmocional", label: "Económico y Emocional" },
+            { name: "economicoAcademico", label: "Económico y Académico" }
+          ].map((filter) => (
+            <Grid item xs={6} md={4} key={filter.name}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={Boolean(filters[filter.name as keyof typeof filters])}
+                    onChange={handleFilterChange}
+                    name={filter.name}
+                  />
+                }
+                label={filter.label}
+              />
+            </Grid>
+          ))}
+          {/* Estado Administrativo Filter */}
+          <Grid item xs={12} md={6}>
+            <FormControl fullWidth>
+              <FormLabel>Estado Administrativo</FormLabel>
+              <Select
+                name="state"
+                value={filters.state}
+                onChange={handleFilterChange}
+                displayEmpty
+              >
+                <MenuItem value="all">Todos</MenuItem>
+                <MenuItem value="pendiente">Pendiente</MenuItem>
+                <MenuItem value="procesado">Procesado</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Verificado Filter */}
+          <Grid item xs={12} md={6}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Estado de Verificación</FormLabel>
+              <RadioGroup row name="verified" value={filters.verified} onChange={radioControl}>
+                <FormControlLabel value="true" control={<Radio />} label="Verificado" />
+                <FormControlLabel value="false" control={<Radio />} label="No Verificado" />
+              </RadioGroup>
+            </FormControl>
+
+          </Grid>
+
+        </Grid>
+      </Paper>
+
+
+      <TextField
+        label="Buscar alumno"
+        variant="outlined"
+        fullWidth
+        value={searchQuery}
+        onChange={handleSearchChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        sx={{ mb: 2 }}
+      />
+      {/* DataGrid Container */}
+      <Paper sx={{ flexGrow: 1, p: 2 }}>
+        <DataGrid
+          rows={filteredStudents}
+          columns={columns}
+          getRowId={(row) => row.mail}
+          sx={{ height: "100%", width: "100%" }}
         />
-        <Paper elevation={3}>
-          <DataGrid
-            rows={filteredStudents}
-            columns={columns}
-            getRowId={(row) => row.mail}  // Use _id as the unique row identifier
-            sx={{ height: '100%', width: '100%' }}  // Ensure DataGrid fills the container
-          />
-        </Paper>
-      </Box>
+      </Paper>
       <Modal open={openModal} onClose={handleModalClose}>
         <Box
           sx={{
