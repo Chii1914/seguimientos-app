@@ -1,2 +1,2 @@
-const __url = 'http://localhost:3000/api';
+const __url = 'https://segapi.administracionpublica-uv.cl/api';
 export default __url;
