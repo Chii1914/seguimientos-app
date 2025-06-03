@@ -8,24 +8,25 @@ import { SelectChangeEvent } from '@mui/material';
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Table, Checkbox, FormControlLabel, Grid, Card, CardActions, CardContent } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Verified } from '@mui/icons-material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileUploadButton from '../lib/filesButton';
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Cookies from "js-cookie";
-import { headers } from 'next/headers';
 import __url from '../lib/const';
 import Swal from 'sweetalert2';
+import { useAccessToken } from '../../context/TokenContext';
+
 interface FileData {
   documentFiles: string[];
   carnetFiles: string[];
 }
 
 export default function Students() {
+
+  
+  const token = useAccessToken();
 
   const [students, setStudents] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -127,7 +128,7 @@ export default function Students() {
     if (result.isConfirmed) {
       try {
         const endpoint = `${__url}/student/delete/${selectedStudent.mail}/${filename}/${category}`;
-        await axios.delete(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+        await axios.delete(endpoint, { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' });
 
         Swal.fire({
           title: '¡Borrado!',
@@ -152,17 +153,21 @@ export default function Students() {
       }
     }
   };
+  const fetchStudents = async () => {
+    if (!token) return; // Wait until token is available
+    try {
+      const response = await axios.get(`${__url}/student`, { headers: { Authorization: `Bearer ${token}` } });
+      setStudents(response.data);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
+  };
 
   useEffect(() => {
-    axios.get(`${__url}/student`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
-      .then(response => {
-        setStudents(response.data);
-
-      })
-      .catch(error => {
-        console.error('Error fetching students:', error);
-      });
-  }, [reload]);
+    if (token) {
+      fetchStudents();
+    }
+  }, [token, reload]);
 
   useEffect(() => {
     const filtered = students.filter((student) => {
@@ -190,7 +195,7 @@ export default function Students() {
     try {
       await axios.get(`${__url}/student/filenames`, {
         headers: {
-          Authorization: `${Cookies.get('xvlf')}`, // Replace with the actual token
+          Authorization: `Bearer ${token}`, // Replace with the actual token
         },
       });
     } catch (err) {
@@ -234,7 +239,7 @@ export default function Students() {
         mail: student.mail,
         verified: state
       }, {
-        headers: { Authorization: `${Cookies.get("xvlf")}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
       setReload(!reload);
       alert(`Estado administrativo de ${student.name} ${student.fatherLastName} actualizado correctamente`);
@@ -276,7 +281,7 @@ export default function Students() {
         mail: selectedStudent.mail,
         message: message.value
       }, {
-        headers: { Authorization: `${Cookies.get("xvlf")}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
 
@@ -305,7 +310,7 @@ export default function Students() {
       const endpoint = `${__url}/student/download/${selectedStudent.mail}/${filename}/${category}`;
 
       // Make a GET request to the backend with the correct responseType
-      const response = await axios.get(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+      const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' });
 
       if (response.data && response.data.file && Array.isArray(response.data.file.data)) {
         // Convert the array of numbers (Buffer) to a Uint8Array
@@ -364,7 +369,7 @@ export default function Students() {
     try {
       const response = await axios.get(`${__url}/student/filenames/${student.mail}`, {
         headers: {
-          Authorization: `${Cookies.get('xvlf')}`,
+          Authorization: `Bearer ${token}`,
         }
       });
       console.log(response.data)

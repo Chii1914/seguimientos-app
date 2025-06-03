@@ -1,64 +1,188 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import __url from '../main/lib/const';
+import { useState } from "react";
+import axios from "axios";
 import Cookies from "js-cookie";
+import {
+  Box,
+  Button,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
+import FileUploadButton from "../main/lib/filesButton";
+import { useTheme } from "@mui/material/styles";  // Importa useTheme
+import { Logout } from '@mui/icons-material';
+import { useAccessToken } from '../context/TokenContext';
 
-export default function Success() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true); 
+interface PhotoState {
+  photo: string | null;
+}
 
-  // ESTUDIANTE
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const xvlf = params.get("xvlf");
+export default function Reports() {
+    const token = useAccessToken();
+  
+  // State to hold the uploaded photos
+  const [photos, setPhotos] = useState<PhotoState[]>([
+    { photo: null },
+    { photo: null },
+  ]);
 
-    Cookies.remove("xvlf");
+  // State to hold the consent checkbox value
+  const [consent, setConsent] = useState(false);
 
-    if (xvlf) {
-      Cookies.set("xvlf", xvlf, { expires: 7, path: "/" });
-      const newToken = Cookies.get("xvlf");
+  // Usamos useTheme para acceder al tema global
+  const theme = useTheme();
 
-      if (newToken === xvlf) {
-        setTimeout(() => {
-          router.push("/student/documents");
-        }, 2000); // Optional: delay for spinner visibility
-      } else {
-        console.error("Failed to set the new token correctly.");
-        setLoading(false); // Stop loading if token fails
-      }
-    } else {
-      console.error("No token found in URL parameters.");
-      setLoading(false); // Stop loading if no token
+  const handlePhotoUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const objectURL = URL.createObjectURL(file);
+      setPhotos((prevPhotos) => {
+        const updatedPhotos = [...prevPhotos];
+        updatedPhotos[index].photo = objectURL;
+        return updatedPhotos;
+      });
     }
-  }, [router]);
+  };
+
+
+  const labels = ["Foto carnet anverso", "Foto carnet reverso"];
+
+  const handleSubmit = async () => {
+    // Check if both photos are uploaded
+    if (photos.some((photoState) => photoState.photo === null)) {
+      alert("Please upload both photos.");
+      return;
+    }
+
+    // Check if consent is given
+    if (!consent) {
+      alert("Debes aceptar el consentimiento para subir el consentimiento para las fotografías");
+      return;
+    }
+
+    // Prepare the FormData
+    const formData = new FormData();
+    const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+
+    fileInputs.forEach((input, index) => {
+      if (index >= 2) {
+        input.value = ''; // Clear excess file inputs
+      } else if (input.files && input.files[0]) {
+        const fieldName = index === 0 ? 'anverso' : 'reverso';
+        formData.append(fieldName, input.files[0]);
+      }
+    });
+
+    // Send the request to the backend using axios
+    try {
+      const response = await axios.post(`${__url}/student/identificacion`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 201) {
+        setPhotos([{ photo: null }, { photo: null }]); // Reset photos
+        fileInputs.forEach((input) => {
+          input.value = ''; // Reset file input
+        });
+        setConsent(false); // Reset consent checkbox
+        alert("Fotos subidas correctamente");
+      } else {
+        alert(`Error: ${response.data.message}`);
+      }
+
+    } catch (error) {
+      console.error("Error uploading photos:", error);
+    }
+  };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-      {loading ? (
-        <div className="spinner"></div>
-      ) : (
-        <p>Something went wrong. Please try again.</p>
-      )}
-      <style jsx>{`
-        .spinner {
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Typography variant="h4" color={theme.palette.text.primary} className="text-center" gutterBottom>
+        Verficación y consentimiento del alumno
+      </Typography>
+      <Button color="inherit" type="a" href="/auth/logout">Cerrar sesión</Button>
+      <Grid container spacing={3} justifyContent="center">
+        {photos.map((photoState, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Typography variant="subtitle1" color={theme.palette.text.secondary} gutterBottom>
+              {labels[index]}
+            </Typography>
+            <Card>
+              {photoState.photo ? (
+                <CardMedia
+                  component="img"
+                  alt={`Uploaded Photo ${index + 1}`}
+                  height="200"
+                  image={photoState.photo}
+                />
+              ) : (
+                <CardContent>
+                  <Typography variant="body1" color={theme.palette.text.secondary}>
+                    No se ha subido ninguna foto
+                  </Typography>
+                </CardContent>
+              )}
+              <CardContent>
+                <Button
+                  variant="contained"
+                  component="label"
+                  fullWidth
+                  color="primary"
+                >
+                  {photoState.photo ? "Cambiar foto" : "Subir foto"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    hidden
+                    onChange={(e) => handlePhotoUpload(e, index)}
+                  />
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <Box mt={4}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              color="primary"
+            />
           }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
-    </div>
+          label="Acepto que mis datos sean almacenados para las futuras entrevistas de acuerdo a lo conversado"
+        />
+      </Box>
+      <Box mt={4}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSubmit}
+          disabled={photos.some((photoState) => photoState.photo === null)}
+        >
+          Subir fotografías
+        </Button>
+      </Box>
+      <Box mt={4} className="text-center">
+        <Typography variant="h4" color={theme.palette.text.primary} className="text-center" gutterBottom>
+          Documentos solicitados por el entrevistador
+        </Typography>
+        <FileUploadButton email={''} />
+      </Box>
+    </main>
   );
 }

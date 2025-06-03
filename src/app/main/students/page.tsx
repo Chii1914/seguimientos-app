@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { SelectChangeEvent } from '@mui/material';
-import { useAuth } from "../lib/auth";
 import axios from 'axios';
 import { Box, Button, Typography, Menu, MenuItem, Modal, TextField, Paper, Select, Checkbox, FormControlLabel, Table, Grid, CardContent } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
@@ -22,6 +21,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Radio from '@mui/material/Radio';
+import { useAccessToken } from '../../context/TokenContext';
 
 
 interface FileData {
@@ -30,6 +30,7 @@ interface FileData {
 }
 
 export default function Students() {
+  const token = useAccessToken();
   const [searchQuery, setSearchQuery] = useState("");
 
   const [fileData, setFileData] = useState<FileData>({ documentFiles: [], carnetFiles: [] });
@@ -164,21 +165,26 @@ export default function Students() {
    }, [selectedStudent]);
    */
 
+  // Fetch students function
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get(`${__url}/student/motives`, { headers: { Authorization: `Bearer ${token}` } });
+      if (Array.isArray(response.data)) {
+        setStudents(response.data);
+      } else {
+        console.error("Unexpected API response format", response.data);
+        setStudents([]);
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      setStudents([]);
+    }
+  };
+
   useEffect(() => {
-    axios.get(`${__url}/student/motives`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
-      .then(response => {
-        if (Array.isArray(response.data)) {
-          setStudents(response.data);
-        } else {
-          console.error("Unexpected API response format", response.data);
-          setStudents([]);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching students:', error);
-        setStudents([]); // Ensure it's always an array
-      });
-  }, [reload]);
+    if (!token) return; // Wait for token to be available
+    fetchStudents();
+  }, [reload, token]);
 
   useEffect(() => {
     const filtered = students.filter((student) => {
@@ -201,7 +207,7 @@ export default function Students() {
 
   const fetchFollowUps = async (studentId: string) => {
     try {
-      const response = await axios.get(`${__url}/follow-up/${studentId}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+      const response = await axios.get(`${__url}/follow-up/${studentId}`, { headers: { Authorization: `Bearer ${token}` } });
       setFollowUps(response.data);
     } catch (error) {
       console.error('Error fetching follow-ups:', error);
@@ -214,7 +220,7 @@ export default function Students() {
       const endpoint = `${__url}/student/download/${selectedStudent.mail}/${filename}/${category}`;
 
       // Make a GET request to the backend with the correct responseType
-      const response = await axios.get(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+      const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' });
 
       if (response.data && response.data.file && Array.isArray(response.data.file.data)) {
         // Convert the array of numbers (Buffer) to a Uint8Array
@@ -268,7 +274,7 @@ export default function Students() {
     if (result.isConfirmed) {
       try {
         const endpoint = `${__url}/student/delete/${selectedStudent.mail}/${filename}/${category}`;
-        await axios.delete(endpoint, { headers: { Authorization: `${Cookies.get('xvlf')}` }, responseType: 'json' });
+        await axios.delete(endpoint, { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' });
 
         Swal.fire({
           title: '¡Borrado!',
@@ -295,12 +301,30 @@ export default function Students() {
   };
 
 
+
+  /*
+   const handleAddFollowUp = async () => {
+      console.log(studentId.mail )
+      try {
+        const followUpResponse = await axios.post(`${__url}/follow-up/${studentId.mail}`, {
+          follow_up: followUpData
+        }, { headers: { Authorization: `Bearer ${token}` } });
+        setFollowUpData({ date: '', notes: '', asistentaSocial: false, justAsistentaSocial: '', ajusteAcademico: false, justAjusteAcademico: '', documentosRespaldo: false, justDocumentosRespaldo: '', noAceptaIndicaciones: false, justNoAceptaIndicaciones: '', otro: '' });
+        setOpenModal(false);
+        setStudentId({ mail: '' });
+      } catch (error) {
+        console.error('Error adding follow-up:', error);
+      }
+    };
+  
+  */
+
   const handleAddFollowUp = async () => {
 
     if (!selectedStudent) return;
 
     try {
-      await axios.post(`${__url}/follow-up/${selectedStudent.mail}`, { followUpData }, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+      await axios.post(`${__url}/follow-up/${selectedStudent.mail}`, { follow_up: followUpData }, { headers: { Authorization: `Bearer ${token}` } });
       Swal.fire({
         icon: 'success',
         title: 'Seguimiento añadido correctamente',
@@ -360,7 +384,7 @@ export default function Students() {
     try {
       const response = await axios.get(`${__url}/student/filenames/${studentMail}`, {
         headers: {
-          Authorization: `${Cookies.get('xvlf')}`,
+          Authorization: `Bearer ${token}`,
         }
       });
       setFileData(response.data);
@@ -387,7 +411,7 @@ export default function Students() {
     if (!selectedStudent) return;
     try {
 
-      await axios.patch(`${__url}/student/motives/${selectedStudent.mail}`, selectedStudent, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+      await axios.patch(`${__url}/student/motives/${selectedStudent.mail}`, selectedStudent, { headers: { Authorization: `Bearer ${token}` } });
       setReload(!reload);
       Swal.fire({
         icon: 'success',
@@ -411,7 +435,7 @@ export default function Students() {
     try {
       await axios.patch(`${__url}/student/${selectedStudent._id}`, {
         state: newState
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
 
       setReload(!reload);
       alert(`Estado administrativo de ${selectedStudent.fatherLastName} actualizado correctamente`);

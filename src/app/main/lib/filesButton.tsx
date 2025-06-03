@@ -7,6 +7,8 @@ import Cookies from "js-cookie";
 import axios from 'axios';
 import __url from "./const";
 import Swal from "sweetalert2";
+import { useAccessToken } from '../../context/TokenContext';
+
 
 interface FileWithPreview {
     file: File;
@@ -16,6 +18,8 @@ interface FileUploadButtonProps {
     email: string; // Email passed from the parent component
 }
 const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
+    const token = useAccessToken();
+
     const [files, setFiles] = useState<FileWithPreview[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -51,7 +55,7 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ email }) => {
         try {
             await axios.post(`${__url}/student/upload/documents`, formData, {
                 headers: {
-                    Authorization: `${Cookies.get("xvlf")}`,
+                    Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
                 },
             });

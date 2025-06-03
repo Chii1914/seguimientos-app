@@ -2,20 +2,18 @@
 import React, { useState, useEffect } from "react";
 
 import { Box, Button, MenuItem, Select, TextField, Modal, Typography } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import { useAuth } from "../lib/auth";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import DescriptionIcon from '@mui/icons-material/Description';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from "axios";
 import CreateIcon from '@mui/icons-material/Create';
-import Cookies from "js-cookie";
 import Swal from 'sweetalert2';
 import ModifyModal from "./components/modifyModal";
 import __url from '../lib/const'
+import { useAccessToken } from '../../context/TokenContext';
 
 export default function Reports() {
+
+  const token = useAccessToken();  
   const [reload, setReload] = useState(false);
   const [users, setUsers] = useState<any[]>([])
   const [open, setOpen] = React.useState(false);
@@ -60,15 +58,19 @@ export default function Reports() {
     boxShadow: 24,
     p: 4,
   };
+
   useEffect(() => {
-    axios.get(`${__url}/user`, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
-      .then(response => {
+    const fetchUsers = async () => {
+      if (!token) return;
+      try {
+        const response = await axios.get(`${__url}/user`, { headers: { Authorization: `Bearer ${token}` } });
         setUsers(response.data);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching users:', error);
-      });
-  }, [reload]);
+      }
+    };
+    fetchUsers();
+  }, [reload, token]);
 
   const columns: GridColDef[] = [
     { field: 'mail', headerName: 'Correo', width: 150 },
@@ -118,7 +120,7 @@ export default function Reports() {
 
   const handleSubmit = async () => {
     try {
-      await axios.patch(`${__url}/user/${selectedUser.mail}`, newUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+      await axios.patch(`${__url}/user/${selectedUser.mail}`, newUser, { headers: { Authorization: `Bearer ${token}` } })
       setReload(!reload);
       handleClose();
       setNewUser({
@@ -143,7 +145,7 @@ export default function Reports() {
 
   const handleNewUser = async () => {
     try {
-      await axios.post(`${__url}/user`, createUser, { headers: { Authorization: `${Cookies.get('xvlf')}` } })
+      await axios.post(`${__url}/user`, createUser, { headers: { Authorization: `Bearer ${token}` } })
       setReload(!reload);
       handleCloseNew();
       setCreateUser({
@@ -179,7 +181,7 @@ export default function Reports() {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${__url}/user/${mail}`, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+        await axios.delete(`${__url}/user/${mail}`, { headers: { Authorization: `Bearer ${token}` } });
         setReload(!reload)
         handleClose();
         Swal.fire('Borrado!', 'El usuario a sido borrado.', 'success');
@@ -217,7 +219,7 @@ export default function Reports() {
           <Box sx={style}>
 
             <TextField
-              label="Correo"
+              label="Correo, debe terminar en @uv.cl"
               value={createUser.mail}
               onChange={(e) => handleNewUserFields('mail', e.target.value)}
               fullWidth

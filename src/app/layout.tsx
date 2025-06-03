@@ -5,6 +5,9 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import { StyledRoot } from './StyledRoot';
 import theme from './theme'
 import { ThemeProvider } from "@mui/material/styles";
+import { auth0 } from "../lib/auth0"
+import { TokenProvider } from './context/TokenContext';
+import Login from "./components/login";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,20 +16,47 @@ export const metadata: Metadata = {
   description: "Página de inicio",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <StyledRoot>{children}</StyledRoot>
-          </ThemeProvider>
-        </AppRouterCacheProvider>
-      </body>
-    </html>
-  );
+
+  const session = await auth0.getSession()
+
+
+  if (!session) {
+    return (
+      <html lang="en">
+        <body className={inter.className}>
+          <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+              <Login />
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </body>
+      </html>
+    )
+  }
+
+  if (session) {
+    return (
+      <html lang="en">
+        <body className={inter.className}>
+          <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+              <StyledRoot>
+                <TokenProvider>
+                  {children}
+                </TokenProvider>
+              </StyledRoot>
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+
+        </body>
+      </html>
+
+    )
+  }
 }
+

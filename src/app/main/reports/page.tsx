@@ -1,7 +1,6 @@
 "use client";
 import { Box, Button, Card, Grid, Paper, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
-import { useAuth } from "../lib/auth";
 export default function Reports() {
 
   return (

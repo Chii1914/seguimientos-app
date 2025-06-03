@@ -44,14 +44,19 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
         transform: 'translate(-50%, -50%)',
         bgcolor: 'background.paper',
         p: 4,
-        width: 400
+        width: 400,
+        maxHeight: '90vh', // Allow scrolling if content exceeds this height
+        overflowY: 'auto',
+        borderRadius: 2,
+        boxShadow: 24,
+        
       }}>
         <Typography id="follow-up-modal-title" variant="h6" component="h2" color='black'>
           Añadir Seguimiento
         </Typography>
 
         {/* Date field */}
-        
+
         <Typography id="follow-up-modal-description" variant="body1" component="p" color='black'>
           Fecha seleccionada: {followUpData.timestamp}
         </Typography>
@@ -60,7 +65,7 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({
             displayStaticWrapperAs="desktop"
             value={dayjs(followUpData.timestamp, 'DD-MM-YYYY HH:mm')}
             onChange={(newValue) => setFollowUpData({ ...followUpData, timestamp: newValue?.format('DD-MM-YYYY HH:mm') })}
-            ampm={false} 
+            ampm={false}
           />
         </LocalizationProvider>
 

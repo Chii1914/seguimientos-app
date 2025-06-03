@@ -3,18 +3,21 @@ import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper, Moda
 import { useState } from 'react';
 import axios from 'axios';
 import FollowUpModal from '../components/followUpModals';
-import Cookies from "js-cookie";
 import Swal from 'sweetalert2'
 import __url from '../lib/const'
 import FileUploadButton from "../lib/filesButton";
+import { useAccessToken } from '../../context/TokenContext';
 
 export default function Table() {
-  const [openModal, setOpenModal] = useState(false);
 
+  const token = useAccessToken();  
+
+  const [openModal, setOpenModal] = useState(false);
   const [studentId, setStudentId] = useState({
     mail: ''
   })
-//klaj
+
+
   const [studentData, setStudentData] = useState({
     mail: '',
     rut: 0,
@@ -62,8 +65,8 @@ export default function Table() {
     justAsistentaSocial: '',
     ajusteAcademico: false,
     justAjusteAcademico: '',
-    documentoRespaldo: false,
-    justDocumentoRespaldo: '',
+    documentosRespaldo: false,
+    justDocumentosRespaldo: '',
     noAceptaIndicaciones: false,
     justNoAceptaIndicaciones: '',
     otro: ''
@@ -98,12 +101,12 @@ export default function Table() {
     setMotivesData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (type: string) => {
+  const handleSubmit = async (type: string, studentId: string) => {
     try {
       const newStudent = await axios.post(`${__url}/student/initialform`, {
         student: studentData,
         motive: motivesData
-      }, { headers: { Authorization: `${Cookies.get('xvlf')}` } });
+      }, { headers: { Authorization: `Bearer ${token}`}});
       Swal.fire({
         toast: true,
         title: `Estudiante ${studentData.name} ${studentData.fatherLastName}`,
@@ -112,7 +115,9 @@ export default function Table() {
         confirmButtonText: 'ok'
       });
       if (type === 'addFollow') {
-        setStudentId(newStudent.data.mail)
+        console.log(studentId) 
+        
+        setStudentId({ mail: studentId });
         setOpenModal(true);
       }
       setMotivesData({
@@ -168,12 +173,12 @@ export default function Table() {
   }
 
   const handleAddFollowUp = async () => {
+    console.log(studentId.mail )
     try {
-      const followUpResponse = await axios.post(`${__url}/student/add-follow-up`, {
-
+      const followUpResponse = await axios.post(`${__url}/follow-up/${studentId.mail}`, {
         follow_up: followUpData
-      });
-      setFollowUpData({ date: '', notes: '', asistentaSocial: false, justAsistentaSocial: '', ajusteAcademico: false, justAjusteAcademico: '', documentoRespaldo: false, justDocumentoRespaldo: '', noAceptaIndicaciones: false, justNoAceptaIndicaciones: '', otro: '' });
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setFollowUpData({ date: '', notes: '', asistentaSocial: false, justAsistentaSocial: '', ajusteAcademico: false, justAjusteAcademico: '', documentosRespaldo: false, justDocumentosRespaldo: '', noAceptaIndicaciones: false, justNoAceptaIndicaciones: '', otro: '' });
       setOpenModal(false);
       setStudentId({ mail: '' });
     } catch (error) {
@@ -533,10 +538,10 @@ export default function Table() {
               </Grid>
 
               <Grid item xs={12}>
-                <Button variant="contained" color="primary" onClick={() => handleSubmit("add")}>
+                <Button variant="contained" color="primary" onClick={() => handleSubmit("add", studentData.mail)}>
                   Agregar Estudiante
                 </Button>
-                <Button variant="contained" color="primary" onClick={() => handleSubmit("addFollow")}>
+                <Button variant="contained" color="primary" onClick={() => handleSubmit("addFollow", studentData.mail)}>
                   Agregar Estudiante y añadir un seguimiento
                 </Button>
               </Grid>
@@ -606,15 +611,15 @@ export default function Table() {
               />
             )}
             <FormControlLabel
-              control={<Checkbox checked={followUpData.documentoRespaldo} onChange={(e) => setFollowUpData({ ...followUpData, documentoRespaldo: e.target.checked })} />}
+              control={<Checkbox checked={followUpData.documentosRespaldo} onChange={(e) => setFollowUpData({ ...followUpData, documentosRespaldo: e.target.checked })} />}
               label="Documento de Respaldo"
             />
-            {followUpData.documentoRespaldo && (
+            {followUpData.documentosRespaldo && (
               <TextField
                 label="Justificación"
-                name="justDocumentoRespaldo"
-                value={followUpData.justDocumentoRespaldo}
-                onChange={(e) => setFollowUpData({ ...followUpData, justDocumentoRespaldo: e.target.value })}
+                name="justDocumentosRespaldo"
+                value={followUpData.justDocumentosRespaldo}
+                onChange={(e) => setFollowUpData({ ...followUpData, justDocumentosRespaldo: e.target.value })}
                 fullWidth
                 margin="normal"
               />

@@ -2,7 +2,7 @@
 import __url from '../../main/lib/const';
 import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/app/main/lib/auth";
+import { useAuth } from "@/app-old/main/lib/auth";
 import Cookies from "js-cookie";
 import {
   Box,
@@ -15,7 +15,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import FileUploadButton from "@/app/main/lib/filesButton";
+import FileUploadButton from "@/app-old/main/lib/filesButton";
 import { useTheme } from "@mui/material/styles";  // Importa useTheme
 import { Logout } from '@mui/icons-material';
 
