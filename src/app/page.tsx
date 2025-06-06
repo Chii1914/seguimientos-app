@@ -36,7 +36,7 @@ export default function Home() {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log(response.data);
-      
+
       if (response.data?.user === 'admin') {
         router.push("/main");
       } if (response.data?.user === 'student') {
@@ -81,6 +81,13 @@ export default function Home() {
                   onClick={() => handleLogin()}
                 >
                   Confirmar
+                </Button>
+                <Button
+                  variant="outlined"
+                  component="a"
+                  href="/auth/logout"
+                >
+                  No soy {user.name}
                 </Button>
               </Grid>
             </Paper>

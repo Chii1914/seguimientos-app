@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper, Modal, FormControlLabel, Checkbox } from "@mui/material";
+import { Box, Button, Grid, Typography, TextField, Select, MenuItem, Paper, Modal, FormControlLabel, Checkbox, SelectChangeEvent } from "@mui/material";
 import { useState } from 'react';
 import axios from 'axios';
 import FollowUpModal from '../components/followUpModals';
@@ -10,7 +10,7 @@ import { useAccessToken } from '../../context/TokenContext';
 
 export default function Table() {
 
-  const token = useAccessToken();  
+  const token = useAccessToken();
 
   const [openModal, setOpenModal] = useState(false);
   const [studentId, setStudentId] = useState({
@@ -20,18 +20,19 @@ export default function Table() {
 
   const [studentData, setStudentData] = useState({
     mail: '',
-    rut: 0,
+    rut: '',
     df: '',
     semester: 1,
     name: '',
-    phone: 0,
+    phone: '',
     secondName: '',
     fatherLastName: '',
     motherLastName: '',
     sede: '',
     verified: false,
     remedialAction: ''
-  })
+  });
+
 
   const [motivesData, setMotivesData] = useState({
     consumoSustancias: false,
@@ -72,16 +73,32 @@ export default function Table() {
     otro: ''
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setStudentData((prev) => {
-      let formattedValue = value;
-      if (name === 'rut' || name === 'phone') {
-        formattedValue = parseInt(value, 10);
-      }
-      return { ...prev, [name]: formattedValue };
-    });
+    setStudentData((prev) => ({ ...prev, [name!]: value }));
   };
+
+  const handleSelectChange = (
+    e: SelectChangeEvent<string>
+  ) => {
+    const { name, value } = e.target;
+    setStudentData((prev) => ({ ...prev, [name!]: value }));
+  };
+
+  const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (!/^\d*$/.test(value)) return; // Only allow digits
+    setStudentData((prev) => ({ ...prev, rut: value }));
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (!/^\d*$/.test(value)) return; // Only allow digits
+    setStudentData((prev) => ({ ...prev, phone: value }));
+  };
+
 
 
   const handleCheckboxChange = (e: any) => {
@@ -106,7 +123,7 @@ export default function Table() {
       const newStudent = await axios.post(`${__url}/student/initialform`, {
         student: studentData,
         motive: motivesData
-      }, { headers: { Authorization: `Bearer ${token}`}});
+      }, { headers: { Authorization: `Bearer ${token}` } });
       Swal.fire({
         toast: true,
         title: `Estudiante ${studentData.name} ${studentData.fatherLastName}`,
@@ -115,8 +132,8 @@ export default function Table() {
         confirmButtonText: 'ok'
       });
       if (type === 'addFollow') {
-        console.log(studentId) 
-        
+        console.log(studentId)
+
         setStudentId({ mail: studentId });
         setOpenModal(true);
       }
@@ -146,11 +163,11 @@ export default function Table() {
       })
       setStudentData({
         mail: '',
-        rut: 0,
+        rut: '',
         df: '',
         semester: 2,
         name: '',
-        phone: 0,
+        phone: '',
         secondName: '',
         fatherLastName: '',
         motherLastName: '',
@@ -173,7 +190,7 @@ export default function Table() {
   }
 
   const handleAddFollowUp = async () => {
-    console.log(studentId.mail )
+    console.log(studentId.mail)
     try {
       const followUpResponse = await axios.post(`${__url}/follow-up/${studentId.mail}`, {
         follow_up: followUpData
@@ -197,14 +214,21 @@ export default function Table() {
                 label="RUT"
                 name="rut"
                 value={studentData.rut}
-                onChange={handleChange}
+                onChange={handleRutChange}
                 fullWidth
                 required
                 type="tel"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-
+                onKeyDown={(e) => {
+                  const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                  if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
               />
-            </Grid>
+
+
+                onChange={handleSelectChange}
             <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Dígito Verificador</Typography>
             <Grid item xs={12}>
               <Select
@@ -301,12 +325,19 @@ export default function Table() {
                 label="Teléfono"
                 name="phone"
                 value={studentData.phone}
-                onChange={handleChange}
-                type="tel"
+                onChange={handlePhoneChange}
                 fullWidth
                 required
+                type="tel"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                onKeyDown={(e) => {
+                  const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                  if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
               />
+
             </Grid>
             <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Motivos de Ingreso</Typography>
 

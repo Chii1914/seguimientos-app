@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker-build": "docker build --platform=linux/amd64 -t chiii1998/seguimientos . && docker push chiii1998/seguimientos"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.6.0",

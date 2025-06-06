@@ -1,11 +1,17 @@
-version: '3.8'
 services:
   nextjs:
-    image: seguimientos
-    container_name: nextjs_app
+    image: chiii1998/seguimientos
+    container_name: seguimientos
     restart: always
     # Exponer el 4200, redirige al 3000
     ports:
       - "4200:3000"
     environment:
       - NODE_ENV=production
+      - AUTH0_DOMAIN=https://dev-1mqyucknj7s4oolf.us.auth0.com
+      - AUTH0_CLIENT_ID=nXLtCzujAWlwTou4CFyqqkuUTzmDOaiV
+      - AUTH0_CLIENT_SECRET=apc5k9gTxu344XSuPlvMz2ivzYwK9Em37lUKleQJdpHFzzr53kSBb8G7F6bBKJZM
+      - AUTH0_SECRET=a0433aeecf631ef800b2e769206423d86327236b2e1118efa32f2ff5802d8fd5
+      - APP_BASE_URL=https://seg.administracionpublica-uv.cl
+      - AUTH0_AUDIENCE=https://auth-api.com
+      - AUTH0_SCOPE=openid profile email
