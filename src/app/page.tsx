@@ -62,7 +62,7 @@ export default function Home() {
                   variant="h4"
                   className="text-center"
                 >
-                  Sistema de seguimientos académicos uv
+                  Sistema de seguimientos académicos
                 </Typography>
 
                 <Typography>

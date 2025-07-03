@@ -17,12 +17,11 @@ export default function Table() {
     mail: ''
   })
 
-
   const [studentData, setStudentData] = useState({
     mail: '',
     rut: '',
     df: '',
-    semester: 1,
+    semester: '1',
     name: '',
     phone: '',
     secondName: '',
@@ -32,7 +31,6 @@ export default function Table() {
     verified: false,
     remedialAction: ''
   });
-
 
   const [motivesData, setMotivesData] = useState({
     consumoSustancias: false,
@@ -99,9 +97,7 @@ export default function Table() {
     setStudentData((prev) => ({ ...prev, phone: value }));
   };
 
-
-
-  const handleCheckboxChange = (e: any) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setMotivesData((prev) => {
       const justificationField = `just${name.charAt(0).toUpperCase() + name.slice(1)}` as keyof typeof prev;
@@ -113,9 +109,51 @@ export default function Table() {
     });
   };
 
-  const handleJustificationChange = (e: any) => {
+  const handleJustificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setMotivesData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setMotivesData({
+      consumoSustancias: false,
+      justConsumoSustancias: '',
+      convivencia: false,
+      justConvivencia: '',
+      emocionalYAcademico: false,
+      justEmocionalYAcademico: '',
+      emocional: false,
+      justEmocional: '',
+      academico: false,
+      justAcademico: '',
+      uvInclusiva: false,
+      justUvInclusiva: '',
+      abuso: false,
+      justAbuso: '',
+      economico: false,
+      justEconomico: '',
+      economicoEmocionalAcademico: false,
+      justEconomicoEmocionalAcademico: '',
+      economicoEmocional: false,
+      justEconomicoEmocional: '',
+      economicoAcademico: false,
+      justEconomicoAcademico: ''
+    });
+    
+    setStudentData({
+      mail: '',
+      rut: '',
+      df: '',
+      semester: '1',
+      name: '',
+      phone: '',
+      secondName: '',
+      fatherLastName: '',
+      motherLastName: '',
+      sede: '',
+      verified: false,
+      remedialAction: ''
+    });
   };
 
   const handleSubmit = async (type: string, studentId: string) => {
@@ -124,6 +162,7 @@ export default function Table() {
         student: studentData,
         motive: motivesData
       }, { headers: { Authorization: `Bearer ${token}` } });
+      
       Swal.fire({
         toast: true,
         title: `Estudiante ${studentData.name} ${studentData.fatherLastName}`,
@@ -131,50 +170,14 @@ export default function Table() {
         icon: 'success',
         confirmButtonText: 'ok'
       });
+      
       if (type === 'addFollow') {
         console.log(studentId)
-
         setStudentId({ mail: studentId });
         setOpenModal(true);
       }
-      setMotivesData({
-        consumoSustancias: false,
-        justConsumoSustancias: '',
-        convivencia: false,
-        justConvivencia: '',
-        emocionalYAcademico: false,
-        justEmocionalYAcademico: '',
-        emocional: false,
-        justEmocional: '',
-        academico: false,
-        justAcademico: '',
-        uvInclusiva: false,
-        justUvInclusiva: '',
-        abuso: false,
-        justAbuso: '',
-        economico: false,
-        justEconomico: '',
-        economicoEmocionalAcademico: false,
-        justEconomicoEmocionalAcademico: '',
-        economicoEmocional: false,
-        justEconomicoEmocional: '',
-        economicoAcademico: false,
-        justEconomicoAcademico: ''
-      })
-      setStudentData({
-        mail: '',
-        rut: '',
-        df: '',
-        semester: 2,
-        name: '',
-        phone: '',
-        secondName: '',
-        fatherLastName: '',
-        motherLastName: '',
-        sede: '',
-        verified: false,
-        remedialAction: ''
-      })
+      
+      resetForm();
     }
     catch (err) {
       Swal.fire({
@@ -186,7 +189,6 @@ export default function Table() {
       });
       console.error(err)
     }
-
   }
 
   const handleAddFollowUp = async () => {
@@ -195,7 +197,20 @@ export default function Table() {
       const followUpResponse = await axios.post(`${__url}/follow-up/${studentId.mail}`, {
         follow_up: followUpData
       }, { headers: { Authorization: `Bearer ${token}` } });
-      setFollowUpData({ date: '', notes: '', asistentaSocial: false, justAsistentaSocial: '', ajusteAcademico: false, justAjusteAcademico: '', documentosRespaldo: false, justDocumentosRespaldo: '', noAceptaIndicaciones: false, justNoAceptaIndicaciones: '', otro: '' });
+      
+      setFollowUpData({ 
+        date: '', 
+        notes: '', 
+        asistentaSocial: false, 
+        justAsistentaSocial: '', 
+        ajusteAcademico: false, 
+        justAjusteAcademico: '', 
+        documentosRespaldo: false, 
+        justDocumentosRespaldo: '', 
+        noAceptaIndicaciones: false, 
+        justNoAceptaIndicaciones: '', 
+        otro: '' 
+      });
       setOpenModal(false);
       setStudentId({ mail: '' });
     } catch (error) {
@@ -206,7 +221,10 @@ export default function Table() {
   return (
     <Paper>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <Typography variant="h4" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Añadir Alumno</Typography>
+        <Typography variant="h4" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>
+          Añadir Alumno
+        </Typography>
+        
         <Box component="form" sx={{ mt: 4, width: '100%', maxWidth: '600px' }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -226,16 +244,17 @@ export default function Table() {
                   }
                 }}
               />
+            </Grid>
 
-
-                onChange={handleSelectChange}
-            <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Dígito Verificador</Typography>
             <Grid item xs={12}>
+              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>
+                Dígito Verificador
+              </Typography>
               <Select
                 label="Dígito verificador"
                 name="df"
                 value={studentData.df}
-                onChange={handleChange}
+                onChange={handleSelectChange}
                 fullWidth
                 required
               >
@@ -244,6 +263,7 @@ export default function Table() {
                 ))}
               </Select>
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Nombre"
@@ -254,6 +274,7 @@ export default function Table() {
                 required
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Segundo Nombre"
@@ -261,9 +282,9 @@ export default function Table() {
                 value={studentData.secondName}
                 onChange={handleChange}
                 fullWidth
-                required
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Apellido Paterno"
@@ -274,6 +295,7 @@ export default function Table() {
                 required
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Apellido Materno"
@@ -284,13 +306,16 @@ export default function Table() {
                 required
               />
             </Grid>
-            <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Semestre</Typography>
+
             <Grid item xs={12}>
+              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>
+                Semestre
+              </Typography>
               <Select
                 label="Semestre"
                 name="semester"
                 value={studentData.semester}
-                onChange={handleChange}
+                onChange={handleSelectChange}
                 fullWidth
                 required
               >
@@ -310,6 +335,7 @@ export default function Table() {
                 ))}
               </Select>
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Email institucional del alumno"
@@ -318,8 +344,10 @@ export default function Table() {
                 onChange={handleChange}
                 fullWidth
                 required
+                type="email"
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Teléfono"
@@ -337,11 +365,15 @@ export default function Table() {
                   }
                 }}
               />
-
             </Grid>
-            <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Motivos de Ingreso</Typography>
 
-            {/** Consumo problemático de sustancias */}
+            <Grid item xs={12}>
+              <Typography variant="h6" style={{ color: 'black', marginTop: '20px', marginBottom: '10px' }}>
+                Motivos de Ingreso
+              </Typography>
+            </Grid>
+
+            {/* Consumo problemático de sustancias */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.consumoSustancias} onChange={handleCheckboxChange} name="consumoSustancias" />}
@@ -355,11 +387,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Convivencia y buen trato en la carrera */}
+            {/* Convivencia y buen trato en la carrera */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.convivencia} onChange={handleCheckboxChange} name="convivencia" />}
@@ -373,11 +408,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Emocional y académico */}
+            {/* Emocional y académico */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.emocionalYAcademico} onChange={handleCheckboxChange} name="emocionalYAcademico" />}
@@ -391,11 +429,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Solo emocional */}
+            {/* Solo emocional */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.emocional} onChange={handleCheckboxChange} name="emocional" />}
@@ -409,11 +450,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Solo académico */}
+            {/* Solo académico */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.academico} onChange={handleCheckboxChange} name="academico" />}
@@ -427,11 +471,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** UV Inclusiva */}
+            {/* UV Inclusiva */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.uvInclusiva} onChange={handleCheckboxChange} name="uvInclusiva" />}
@@ -445,11 +492,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Violencia física-psicológica, abuso */}
+            {/* Violencia física-psicológica, abuso */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.abuso} onChange={handleCheckboxChange} name="abuso" />}
@@ -463,11 +513,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Económicos */}
+            {/* Económicos */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.economico} onChange={handleCheckboxChange} name="economico" />}
@@ -481,11 +534,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Económico, emocional y académico */}
+            {/* Económico, emocional y académico */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.economicoEmocionalAcademico} onChange={handleCheckboxChange} name="economicoEmocionalAcademico" />}
@@ -499,11 +555,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Económico y emocional */}
+            {/* Económico y emocional */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.economicoEmocional} onChange={handleCheckboxChange} name="economicoEmocional" />}
@@ -517,11 +576,14 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
 
-            {/** Económico y académico */}
+            {/* Económico y académico */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={motivesData.economicoAcademico} onChange={handleCheckboxChange} name="economicoAcademico" />}
@@ -535,9 +597,13 @@ export default function Table() {
                   onChange={handleJustificationChange}
                   fullWidth
                   required
+                  multiline
+                  rows={3}
+                  sx={{ mt: 1 }}
                 />
               )}
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Acción Remedial"
@@ -546,15 +612,20 @@ export default function Table() {
                 onChange={handleChange}
                 fullWidth
                 required
+                multiline
+                rows={4}
               />
             </Grid>
-            <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Sede</Typography>
+
             <Grid item xs={12}>
+              <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>
+                Sede
+              </Typography>
               <Select
                 label="Sede"
                 name="sede"
                 value={studentData.sede}
-                onChange={handleChange}
+                onChange={handleSelectChange}
                 fullWidth
                 required
               >
@@ -562,26 +633,46 @@ export default function Table() {
                   <MenuItem key={sede} value={sede}>{sede}</MenuItem>
                 ))}
               </Select>
-              <Grid item xs={12}>
-                <Typography variant="h6" style={{ color: 'black', marginTop: '3px', marginBottom: '3px' }}>Certificados</Typography>
-                <p>En este apartado podrá subir archivos que respalden la situación del estudiante</p>
-                <FileUploadButton email={studentData.mail} />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button variant="contained" color="primary" onClick={() => handleSubmit("add", studentData.mail)}>
-                  Agregar Estudiante
-                </Button>
-                <Button variant="contained" color="primary" onClick={() => handleSubmit("addFollow", studentData.mail)}>
-                  Agregar Estudiante y añadir un seguimiento
-                </Button>
-              </Grid>
-
             </Grid>
 
+            <Grid item xs={12}>
+              <Typography variant="h6" style={{ color: 'black', marginTop: '20px', marginBottom: '10px' }}>
+                Certificados
+              </Typography>
+              <Typography variant="body2" style={{ marginBottom: '10px' }}>
+                En este apartado podrá subir archivos que respalden la situación del estudiante
+              </Typography>
+              <FileUploadButton email={studentData.mail} />
+            </Grid>
+
+            <Grid item xs={12} sx={{ mt: 3 }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={() => handleSubmit("add", studentData.mail)}
+                >
+                  Agregar Estudiante
+                </Button>
+                <Button 
+                  variant="contained" 
+                  color="secondary" 
+                  onClick={() => handleSubmit("addFollow", studentData.mail)}
+                >
+                  Agregar Estudiante y añadir un seguimiento
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
         </Box>
-        <Modal open={openModal} onClose={() => setOpenModal(false)} aria-labelledby="follow-up-modal-title" aria-describedby="follow-up-modal-description">
+
+        {/* Simplified Modal - Remove duplicate as FollowUpModal component is used below */}
+        <Modal 
+          open={openModal} 
+          onClose={() => setOpenModal(false)} 
+          aria-labelledby="follow-up-modal-title" 
+          aria-describedby="follow-up-modal-description"
+        >
           <Box sx={{
             position: 'absolute',
             top: '50%',
@@ -589,7 +680,9 @@ export default function Table() {
             transform: 'translate(-50%, -50%)',
             bgcolor: 'background.paper',
             p: 4,
-            width: 400
+            width: 400,
+            maxHeight: '90vh',
+            overflow: 'auto'
           }}>
             <Typography id="follow-up-modal-title" variant="h6" component="h2">
               Añadir Seguimiento
@@ -611,10 +704,17 @@ export default function Table() {
               onChange={(e) => setFollowUpData({ ...followUpData, notes: e.target.value })}
               fullWidth
               margin="normal"
+              multiline
+              rows={3}
             />
-            {/* Additional fields for follow-up modal */}
+            
             <FormControlLabel
-              control={<Checkbox checked={followUpData.asistentaSocial} onChange={(e) => setFollowUpData({ ...followUpData, asistentaSocial: e.target.checked })} />}
+              control={
+                <Checkbox 
+                  checked={followUpData.asistentaSocial} 
+                  onChange={(e) => setFollowUpData({ ...followUpData, asistentaSocial: e.target.checked })} 
+                />
+              }
               label="Asistenta Social"
             />
             {followUpData.asistentaSocial && (
@@ -625,10 +725,18 @@ export default function Table() {
                 onChange={(e) => setFollowUpData({ ...followUpData, justAsistentaSocial: e.target.value })}
                 fullWidth
                 margin="normal"
+                multiline
+                rows={2}
               />
             )}
+            
             <FormControlLabel
-              control={<Checkbox checked={followUpData.ajusteAcademico} onChange={(e) => setFollowUpData({ ...followUpData, ajusteAcademico: e.target.checked })} />}
+              control={
+                <Checkbox 
+                  checked={followUpData.ajusteAcademico} 
+                  onChange={(e) => setFollowUpData({ ...followUpData, ajusteAcademico: e.target.checked })} 
+                />
+              }
               label="Ajuste Académico"
             />
             {followUpData.ajusteAcademico && (
@@ -639,10 +747,18 @@ export default function Table() {
                 onChange={(e) => setFollowUpData({ ...followUpData, justAjusteAcademico: e.target.value })}
                 fullWidth
                 margin="normal"
+                multiline
+                rows={2}
               />
             )}
+            
             <FormControlLabel
-              control={<Checkbox checked={followUpData.documentosRespaldo} onChange={(e) => setFollowUpData({ ...followUpData, documentosRespaldo: e.target.checked })} />}
+              control={
+                <Checkbox 
+                  checked={followUpData.documentosRespaldo} 
+                  onChange={(e) => setFollowUpData({ ...followUpData, documentosRespaldo: e.target.checked })} 
+                />
+              }
               label="Documento de Respaldo"
             />
             {followUpData.documentosRespaldo && (
@@ -653,10 +769,18 @@ export default function Table() {
                 onChange={(e) => setFollowUpData({ ...followUpData, justDocumentosRespaldo: e.target.value })}
                 fullWidth
                 margin="normal"
+                multiline
+                rows={2}
               />
             )}
+            
             <FormControlLabel
-              control={<Checkbox checked={followUpData.noAceptaIndicaciones} onChange={(e) => setFollowUpData({ ...followUpData, noAceptaIndicaciones: e.target.checked })} />}
+              control={
+                <Checkbox 
+                  checked={followUpData.noAceptaIndicaciones} 
+                  onChange={(e) => setFollowUpData({ ...followUpData, noAceptaIndicaciones: e.target.checked })} 
+                />
+              }
               label="No Acepta Indicaciones"
             />
             {followUpData.noAceptaIndicaciones && (
@@ -667,8 +791,11 @@ export default function Table() {
                 onChange={(e) => setFollowUpData({ ...followUpData, justNoAceptaIndicaciones: e.target.value })}
                 fullWidth
                 margin="normal"
+                multiline
+                rows={2}
               />
             )}
+            
             <TextField
               label="Otro"
               name="otro"
@@ -676,13 +803,23 @@ export default function Table() {
               onChange={(e) => setFollowUpData({ ...followUpData, otro: e.target.value })}
               fullWidth
               margin="normal"
+              multiline
+              rows={2}
             />
-            <Button variant="contained" color="primary" onClick={handleAddFollowUp} sx={{ mt: 2 }}>
+            
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handleAddFollowUp} 
+              sx={{ mt: 2 }}
+            >
               Añadir Seguimiento
             </Button>
           </Box>
         </Modal>
       </main>
+
+      {/* Keep the FollowUpModal component if it has additional functionality */}
       <FollowUpModal
         open={openModal}
         onClose={() => setOpenModal(false)}
